@@ -3,7 +3,6 @@ import SwiftUI
 struct DashboardView: View {
     @Binding var selection: SidebarItem?
     @StateObject private var monitor = SystemMonitor()
-    @StateObject private var agentManager = LaunchAgentManager()
     @State private var purging = false
     @State private var emptyingTrash = false
     @State private var actionMessage: String?
@@ -19,15 +18,11 @@ struct DashboardView: View {
                 }
                 gaugeRow
                 infoRow
-                launchAgentsCard
             }
             .padding(24)
         }
         .background(Theme.background)
-        .onAppear {
-            monitor.start()
-            agentManager.load()
-        }
+        .onAppear { monitor.start() }
         .onDisappear { monitor.stop() }
     }
 
@@ -263,69 +258,6 @@ struct DashboardView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .card()
         }
-    }
-
-    // MARK: 시작 프로그램
-
-    private var launchAgentsCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Label("로그인 항목 및 백그라운드 앱", systemImage: "power")
-                    .font(.headline)
-                    .foregroundStyle(Theme.blue)
-                Spacer()
-                if !agentManager.agents.isEmpty {
-                    Text("\(agentManager.agents.filter(\.enabled).count)/\(agentManager.agents.count)개 켜짐")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            if !agentManager.loaded {
-                ProgressView().controlSize(.small)
-            } else if agentManager.agents.isEmpty {
-                Text("사용자 LaunchAgent가 없습니다 — 깨끗한 상태입니다 ✨")
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(agentManager.agents) { agent in
-                    HStack(spacing: 10) {
-                        Image(systemName: agent.enabled ? "gearshape.fill" : "gearshape")
-                            .foregroundStyle(agent.enabled ? AnyShapeStyle(Theme.teal) : AnyShapeStyle(.tertiary))
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(agent.displayName)
-                                .font(.system(size: 13.5, weight: .medium))
-                            Text(agent.label)
-                                .font(.system(size: 10.5, design: .monospaced))
-                                .foregroundStyle(.tertiary)
-                        }
-                        Spacer()
-                        Button {
-                            NSWorkspace.shared.activateFileViewerSelecting([agent.url])
-                        } label: {
-                            Image(systemName: "folder")
-                                .font(.caption)
-                        }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(.tertiary)
-                        .help("Finder에서 보기")
-                        Toggle("", isOn: Binding(
-                            get: { agent.enabled },
-                            set: { agentManager.setEnabled(agent, $0) }
-                        ))
-                        .toggleStyle(.switch)
-                        .controlSize(.small)
-                        .labelsHidden()
-                        .disabled(agentManager.busy.contains(agent.label))
-                    }
-                    .padding(.vertical, 3)
-                }
-                Text("끄면 다음 로그인부터 자동으로 실행되지 않습니다. 언제든 다시 켤 수 있어요.")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .padding(.top, 4)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .card()
     }
 
     // MARK: 동작

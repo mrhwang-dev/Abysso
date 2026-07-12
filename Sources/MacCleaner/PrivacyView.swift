@@ -392,7 +392,12 @@ struct PrivacyView: View {
                     if model.cleaning {
                         ProgressView().controlSize(.small)
                     } else {
-                        Label("흔적 지우기 (\(Format.bytes(model.selectedSize)))", systemImage: "hand.raised")
+                        Label(
+                            model.selectedCount == 0
+                                ? "선택 항목 없음"
+                                : "흔적 지우기 (\(Format.bytes(model.selectedSize)))",
+                            systemImage: "hand.raised"
+                        )
                     }
                 }
                 .buttonStyle(.borderedProminent)

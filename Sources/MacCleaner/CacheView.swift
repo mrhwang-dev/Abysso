@@ -370,7 +370,12 @@ struct CacheView: View {
                     if model.cleaning {
                         ProgressView().controlSize(.small)
                     } else {
-                        Label("정리 (\(Format.bytes(model.selectedSize)))", systemImage: "sparkles")
+                        Label(
+                            model.selectedCount == 0
+                                ? "선택 항목 없음"
+                                : "정리 (\(Format.bytes(model.selectedSize)))",
+                            systemImage: "sparkles"
+                        )
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -548,7 +553,12 @@ struct FolderBrowserSheet: View {
                     for entry in selected { DiskUtil.trash(entry.url) }
                     load()
                 } label: {
-                    Label("선택 항목 휴지통으로 (\(Format.bytes(selectedSize)))", systemImage: "trash")
+                    Label(
+                        selected.isEmpty
+                            ? "선택 항목 없음"
+                            : "선택 항목 휴지통으로 (\(Format.bytes(selectedSize)))",
+                        systemImage: "trash"
+                    )
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Theme.orange)
