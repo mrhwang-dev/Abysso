@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import IOKit
 import IOKit.ps
@@ -182,17 +183,63 @@ final class SystemMonitor: ObservableObject {
     private var lastNetTime: Date?
     private var lastDiskIO: (read: UInt64, written: UInt64)?
     private var tickCount = 0
+    private var machineLoaded = false
+    private var activeObserver: NSObjectProtocol?
+    private var inactiveObserver: NSObjectProtocol?
+
+    /// 기기 정보는 바뀌지 않으므로 최초 1회만 조회
+    private func loadMachineIfNeeded() {
+        guard !machineLoaded else { return }
+        machine = SystemProbe.machineInfo()
+        machineLoaded = true
+    }
 
     func start() {
-        guard timer == nil else { return }
-        machine = SystemProbe.machineInfo()
-        tick()
-        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.tick() }
-        }
+        guard activeObserver == nil else { return }  // 이미 관리 중이면 무시
+        loadMachineIfNeeded()
+        observeActivation()
+        // 시작 시점에 앱이 활성이면 즉시 폴링, 아니면 대기
+        if NSApp.isActive { resumePolling() }
     }
 
     func stop() {
+        timer?.invalidate()
+        timer = nil
+        for obs in [activeObserver, inactiveObserver].compactMap({ $0 }) {
+            NotificationCenter.default.removeObserver(obs)
+        }
+        activeObserver = nil
+        inactiveObserver = nil
+    }
+
+    /// 앱이 백그라운드로 가면(다른 앱 사용 중) 폴링을 멈추고, 다시 앞으로 오면 재개.
+    /// 사용자가 화면을 보고 있지 않을 때의 CPU/전력 낭비를 없앤다.
+    private func observeActivation() {
+        activeObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.resumePolling() }
+        }
+        inactiveObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didResignActiveNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.pausePolling() }
+        }
+    }
+
+    private func resumePolling() {
+        guard timer == nil else { return }
+        tick()
+        let t = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.tick() }
+        }
+        t.tolerance = 0.5  // 발화를 최대 0.5초까지 묶어 전력 절약
+        timer = t
+    }
+
+    private func pausePolling() {
         timer?.invalidate()
         timer = nil
     }
