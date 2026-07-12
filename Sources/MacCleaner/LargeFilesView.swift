@@ -481,14 +481,20 @@ struct LargeFilesView: View {
                     .foregroundStyle(Theme.green)
             }
             Spacer()
+            let hasSelection = !model.selectedFiles.isEmpty
             Button {
                 model.trashSelected()
             } label: {
-                Label("선택 항목 휴지통으로 (\(Format.bytes(model.selectedSize)))", systemImage: "trash")
+                Label(
+                    hasSelection
+                        ? "선택 항목 휴지통으로 (\(Format.bytes(model.selectedSize)))"
+                        : "선택 항목 없음",
+                    systemImage: "trash"
+                )
             }
             .buttonStyle(.borderedProminent)
             .tint(Theme.orange)
-            .disabled(model.selectedFiles.isEmpty)
+            .disabled(!hasSelection)
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 12)

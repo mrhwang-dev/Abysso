@@ -9,6 +9,18 @@ struct MacCleanerApp: App {
             ContentView()
                 .frame(minWidth: 820, minHeight: 560)
         }
+        .commands {
+            CommandGroup(replacing: .appSettings) {
+                Button("환경설정…") {
+                    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            }
+        }
+
+        Settings {
+            SettingsView()
+        }
     }
 }
 
@@ -21,6 +33,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
+
+        // 환경설정에서 메뉴 막대를 끈 경우 상태 아이템을 만들지 않음
+        let menuBarEnabled = UserDefaults.standard.object(forKey: "menuBarEnabled") as? Bool ?? true
+        guard menuBarEnabled else { return }
 
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = item.button {

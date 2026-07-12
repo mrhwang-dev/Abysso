@@ -5,9 +5,11 @@ enum SidebarItem: String, CaseIterable, Identifiable {
     case cache = "스마트 정리"
     case largeFiles = "스페이스 렌즈"
     case uninstall = "앱 제거"
+    case oldFiles = "오래된 대용량 파일"
     case shredder = "파쇄기"
     case privacy = "개인정보 보호"
     case malware = "악성 프로그램 스캔"
+    case optimization = "최적화"
     case maintenance = "유지보수"
     case updater = "업데이트"
     case extensions = "확장 프로그램"
@@ -23,6 +25,8 @@ enum SidebarItem: String, CaseIterable, Identifiable {
         case .shredder: return "flame.fill"
         case .privacy: return "hand.raised.fill"
         case .malware: return "shield.lefthalf.filled"
+        case .oldFiles: return "clock.badge.exclamationmark.fill"
+        case .optimization: return "bolt.badge.checkmark"
         case .maintenance: return "wrench.and.screwdriver.fill"
         case .updater: return "arrow.triangle.2.circlepath"
         case .extensions: return "puzzlepiece.extension.fill"
@@ -38,6 +42,8 @@ enum SidebarItem: String, CaseIterable, Identifiable {
         case .shredder: return Theme.red
         case .privacy: return Theme.blue
         case .malware: return Theme.red
+        case .oldFiles: return Theme.orange
+        case .optimization: return Theme.blue
         case .maintenance: return Theme.teal
         case .updater: return Theme.green
         case .extensions: return Theme.yellow
@@ -52,6 +58,8 @@ struct ContentView: View {
     @StateObject private var cacheModel = CacheModel()
     @StateObject private var lensModel = LargeFilesModel()
     @StateObject private var uninstallModel = UninstallModel()
+    @StateObject private var oldFilesModel = OldFilesModel()
+    @StateObject private var optimizationModel = OptimizationModel()
     @StateObject private var shredderModel = ShredderModel()
     @StateObject private var privacyModel = PrivacyModel()
     @StateObject private var malwareModel = MalwareModel()
@@ -64,9 +72,9 @@ struct ContentView: View {
 
     private static let sections: [(String, [SidebarItem])] = [
         ("모니터링", [.dashboard]),
-        ("정리", [.cache, .largeFiles, .uninstall, .shredder]),
+        ("정리", [.cache, .largeFiles, .oldFiles, .uninstall, .shredder]),
         ("보안", [.privacy, .malware]),
-        ("관리", [.maintenance, .updater, .extensions]),
+        ("관리", [.optimization, .maintenance, .updater, .extensions]),
     ]
 
     var body: some View {
@@ -110,6 +118,8 @@ struct ContentView: View {
                 case .cache: CacheView()
                 case .largeFiles: LargeFilesView()
                 case .uninstall: UninstallView()
+                case .oldFiles: OldFilesView()
+                case .optimization: OptimizationView()
                 case .shredder: ShredderView()
                 case .privacy: PrivacyView()
                 case .malware: MalwareView()
@@ -123,6 +133,8 @@ struct ContentView: View {
         .environmentObject(cacheModel)
         .environmentObject(lensModel)
         .environmentObject(uninstallModel)
+        .environmentObject(oldFilesModel)
+        .environmentObject(optimizationModel)
         .environmentObject(shredderModel)
         .environmentObject(privacyModel)
         .environmentObject(malwareModel)
