@@ -42,7 +42,13 @@ final class PrivacyModel: ObservableObject {
         scanned = true
         lastCleaned = nil
         Task.detached(priority: .userInitiated) {
+            let start = Date()
             let result = Self.findPrivacyData()
+            // 스캔이 순식간에 끝나면 레이더 애니메이션이 보이도록 최소 표시 시간 확보
+            let elapsed = Date().timeIntervalSince(start)
+            if elapsed < 1.8 {
+                try? await Task.sleep(for: .seconds(1.8 - elapsed))
+            }
             await MainActor.run {
                 withAnimation {
                     self.categories = result
@@ -231,6 +237,19 @@ final class PrivacyModel: ObservableObject {
 struct PrivacyView: View {
     @EnvironmentObject private var model: PrivacyModel
 
+    /// 스캔 중 티커에 표시할 검사 위치 목록
+    private static let tickerPaths: [String] = [
+        "~/Library/Safari/History.db",
+        "~/Library/Safari/Downloads.plist",
+        "~/Library/Cookies",
+        "~/Library/Application Support/Google/Chrome/Default/History",
+        "~/Library/Application Support/Google/Chrome/Default/Cookies",
+        "~/Library/Application Support/Microsoft Edge/Default",
+        "~/Library/Application Support/Arc/User Data/Default",
+        "~/Library/Application Support/Firefox/Profiles",
+        "~/Library/Application Support/com.apple.sharedfilelist",
+    ].shuffled()
+
     var body: some View {
         VStack(spacing: 0) {
             PageHeader(
@@ -243,9 +262,14 @@ struct PrivacyView: View {
             .padding(.bottom, 12)
 
             if model.scanning {
-                Spacer()
-                ProgressView("개인정보 흔적을 찾는 중…")
-                Spacer()
+                VStack(spacing: 20) {
+                    Spacer()
+                    ScanRadar(color: Theme.blue, icon: "hand.raised.fill")
+                    Text("개인정보 흔적을 찾는 중…")
+                        .font(.headline)
+                    ScanPathTicker(paths: Self.tickerPaths, color: Theme.blue)
+                    Spacer()
+                }
             } else if !model.scanned {
                 emptyStartView
             } else {

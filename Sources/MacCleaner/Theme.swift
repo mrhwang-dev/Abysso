@@ -360,6 +360,91 @@ struct ParticleField: View {
     }
 }
 
+// MARK: - 레이더 스캔 애니메이션
+
+struct ScanRadar: View {
+    var color: Color = Theme.teal
+    var icon: String = "magnifyingglass"
+    var size: CGFloat = 150
+    @State private var sweeping = false
+    @State private var ripple = false
+
+    var body: some View {
+        ZStack {
+            // 동심원 링
+            ForEach(0..<3, id: \.self) { i in
+                Circle()
+                    .stroke(color.opacity(0.22 - Double(i) * 0.06), lineWidth: 1)
+                    .frame(width: size * (0.45 + CGFloat(i) * 0.28))
+            }
+            // 바깥으로 퍼지는 파동
+            Circle()
+                .stroke(color.opacity(0.35), lineWidth: 1.5)
+                .frame(width: size * 0.4)
+                .scaleEffect(ripple ? 2.4 : 0.9)
+                .opacity(ripple ? 0 : 0.7)
+                .animation(.easeOut(duration: 1.6).repeatForever(autoreverses: false), value: ripple)
+            // 회전하는 스윕
+            Circle()
+                .fill(
+                    AngularGradient(
+                        colors: [color.opacity(0), color.opacity(0), color.opacity(0.45)],
+                        center: .center
+                    )
+                )
+                .frame(width: size, height: size)
+                .mask(Circle().frame(width: size, height: size))
+                .rotationEffect(.degrees(sweeping ? 360 : 0))
+                .animation(.linear(duration: 2.0).repeatForever(autoreverses: false), value: sweeping)
+            // 스윕 끝의 빛나는 라인
+            Rectangle()
+                .fill(LinearGradient(colors: [color.opacity(0), color], startPoint: .leading, endPoint: .trailing))
+                .frame(width: size / 2, height: 1.5)
+                .offset(x: size / 4)
+                .rotationEffect(.degrees(sweeping ? 360 : 0))
+                .animation(.linear(duration: 2.0).repeatForever(autoreverses: false), value: sweeping)
+            // 중앙 아이콘
+            Image(systemName: icon)
+                .font(.system(size: size * 0.17, weight: .semibold))
+                .foregroundStyle(color)
+                .frame(width: size * 0.3, height: size * 0.3)
+                .background(color.opacity(0.12), in: Circle())
+        }
+        .frame(width: size, height: size)
+        .onAppear {
+            sweeping = true
+            ripple = true
+        }
+    }
+}
+
+// MARK: - 검사 경로 티커 (빠르게 스쳐 지나가는 경로 텍스트)
+
+struct ScanPathTicker: View {
+    let paths: [String]
+    var color: Color = Theme.teal
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 0.12)) { context in
+            let t = Int(context.date.timeIntervalSinceReferenceDate / 0.12)
+            let path = paths.isEmpty ? "" : paths[t % paths.count]
+            HStack(spacing: 6) {
+                Image(systemName: "doc.text.magnifyingglass")
+                    .font(.system(size: 10))
+                    .foregroundStyle(color)
+                Text(path)
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .id(path)
+                    .transition(.opacity)
+            }
+            .frame(maxWidth: 380)
+        }
+    }
+}
+
 // MARK: - 섹션 헤더
 
 struct PageHeader: View {

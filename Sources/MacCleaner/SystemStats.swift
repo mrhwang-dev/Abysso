@@ -279,6 +279,14 @@ enum SystemActions {
         return ok
     }
 
+    /// 임의의 셸 명령을 관리자 권한으로 실행 (암호 프롬프트 1회)
+    static func runShellAsAdmin(_ command: String) async -> Bool {
+        let escaped = command
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+        return await runOSAScript("do shell script \"\(escaped)\" with administrator privileges")
+    }
+
     private static func runOSAScript(_ script: String) async -> Bool {
         await withCheckedContinuation { continuation in
             DispatchQueue.global().async {

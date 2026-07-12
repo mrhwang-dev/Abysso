@@ -523,6 +523,9 @@ struct UninstallView: View {
                             Toggle(isOn: $file.selected) { EmptyView() }
                                 .toggleStyle(.checkbox)
                                 .labelsHidden()
+                            Image(nsImage: NSWorkspace.shared.icon(forFile: file.url.path))
+                                .resizable()
+                                .frame(width: 22, height: 22)
                             VStack(alignment: .leading, spacing: 1) {
                                 Text(file.displayPath)
                                     .font(.system(.callout, design: .monospaced))
@@ -677,6 +680,9 @@ struct UninstallView: View {
                         Toggle(isOn: $orphan.selected) { EmptyView() }
                             .toggleStyle(.checkbox)
                             .labelsHidden()
+                        Image(nsImage: NSWorkspace.shared.icon(forFile: orphan.url.path))
+                            .resizable()
+                            .frame(width: 24, height: 24)
                         VStack(alignment: .leading, spacing: 1) {
                             Text(orphan.bundleID)
                                 .font(.system(.callout, design: .monospaced))

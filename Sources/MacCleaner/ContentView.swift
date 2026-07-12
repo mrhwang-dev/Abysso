@@ -8,6 +8,7 @@ enum SidebarItem: String, CaseIterable, Identifiable {
     case shredder = "파쇄기"
     case privacy = "개인정보 보호"
     case malware = "악성 프로그램 스캔"
+    case maintenance = "유지보수"
     case updater = "업데이트"
     case extensions = "확장 프로그램"
 
@@ -22,6 +23,7 @@ enum SidebarItem: String, CaseIterable, Identifiable {
         case .shredder: return "flame.fill"
         case .privacy: return "hand.raised.fill"
         case .malware: return "shield.lefthalf.filled"
+        case .maintenance: return "wrench.and.screwdriver.fill"
         case .updater: return "arrow.triangle.2.circlepath"
         case .extensions: return "puzzlepiece.extension.fill"
         }
@@ -36,6 +38,7 @@ enum SidebarItem: String, CaseIterable, Identifiable {
         case .shredder: return Theme.red
         case .privacy: return Theme.blue
         case .malware: return Theme.red
+        case .maintenance: return Theme.teal
         case .updater: return Theme.green
         case .extensions: return Theme.yellow
         }
@@ -52,6 +55,7 @@ struct ContentView: View {
     @StateObject private var shredderModel = ShredderModel()
     @StateObject private var privacyModel = PrivacyModel()
     @StateObject private var malwareModel = MalwareModel()
+    @StateObject private var maintenanceModel = MaintenanceModel()
     @StateObject private var updaterModel = UpdaterModel()
     @StateObject private var extensionsModel = ExtensionsModel()
 
@@ -62,7 +66,7 @@ struct ContentView: View {
         ("모니터링", [.dashboard]),
         ("정리", [.cache, .largeFiles, .uninstall, .shredder]),
         ("보안", [.privacy, .malware]),
-        ("관리", [.updater, .extensions]),
+        ("관리", [.maintenance, .updater, .extensions]),
     ]
 
     var body: some View {
@@ -109,6 +113,7 @@ struct ContentView: View {
                 case .shredder: ShredderView()
                 case .privacy: PrivacyView()
                 case .malware: MalwareView()
+                case .maintenance: MaintenanceView()
                 case .updater: UpdaterView()
                 case .extensions: ExtensionsView()
                 }
@@ -121,6 +126,7 @@ struct ContentView: View {
         .environmentObject(shredderModel)
         .environmentObject(privacyModel)
         .environmentObject(malwareModel)
+        .environmentObject(maintenanceModel)
         .environmentObject(updaterModel)
         .environmentObject(extensionsModel)
         .navigationTitle("MacCleaner")
