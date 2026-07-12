@@ -1,46 +1,70 @@
 import SwiftUI
-import ServiceManagement
 
-// MARK: - 로그인 자동 실행 관리 (SMAppService)
+// MARK: - 로그인 자동 실행 관리 (LaunchAgent plist 직접 생성)
+//
+// 정식 개발자 인증서 없이 ad-hoc 서명만으로도 확실히 동작하도록
+// ~/Library/LaunchAgents 에 plist를 직접 만들고 launchctl로 등록/해제한다.
 
 @MainActor
 final class LaunchAtLoginManager: ObservableObject {
     @Published var enabled = false
     @Published var errorText: String?
 
+    static let label = "com.cw.maccleaner.launchatlogin"
+
+    private var plistURL: URL {
+        FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/LaunchAgents/\(Self.label).plist")
+    }
+
+    /// 현재 실행 중인 .app 번들 경로 (설치 위치가 바뀌어도 자동 반영)
+    private var appBundlePath: String {
+        Bundle.main.bundleURL.path
+    }
+
     init() { refresh() }
 
     func refresh() {
-        enabled = SMAppService.mainApp.status == .enabled
+        enabled = FileManager.default.fileExists(atPath: plistURL.path)
     }
 
     func set(_ on: Bool) {
         errorText = nil
-        do {
-            if on {
-                try SMAppService.mainApp.register()
-            } else {
-                try SMAppService.mainApp.unregister()
-            }
-        } catch {
-            // 권한 승인 대기(.requiresApproval) 등은 실패로 보지 않도록 상태를 다시 읽음
-            errorText = "설정을 적용하지 못했습니다: \(error.localizedDescription)"
-        }
+        if on { register() } else { unregister() }
         refresh()
-        // status가 requiresApproval이면 시스템 설정으로 안내
-        if on, SMAppService.mainApp.status == .requiresApproval {
-            errorText = "시스템 설정 > 일반 > 로그인 항목에서 MacCleaner를 허용해 주세요."
+    }
+
+    private func register() {
+        let plist: [String: Any] = [
+            "Label": Self.label,
+            "ProgramArguments": ["/usr/bin/open", "-g", appBundlePath],  // -g: 백그라운드로 실행
+            "RunAtLoad": true,
+        ]
+        do {
+            // LaunchAgents 폴더 보장
+            let dir = plistURL.deletingLastPathComponent()
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            let data = try PropertyListSerialization.data(
+                fromPropertyList: plist, format: .xml, options: 0
+            )
+            try data.write(to: plistURL)
+            // 즉시 등록 (다음 로그인까지 기다리지 않도록). 실패해도 파일은 남아 다음 로그인에 적용됨.
+            let uid = getuid()
+            _ = LaunchAgentManager.run("/bin/launchctl", ["bootout", "gui/\(uid)/\(Self.label)"])
+            _ = LaunchAgentManager.run("/bin/launchctl", ["bootstrap", "gui/\(uid)", plistURL.path])
+        } catch {
+            errorText = "자동 실행 설정에 실패했습니다: \(error.localizedDescription)"
         }
     }
 
+    private func unregister() {
+        let uid = getuid()
+        _ = LaunchAgentManager.run("/bin/launchctl", ["bootout", "gui/\(uid)/\(Self.label)"])
+        try? FileManager.default.removeItem(at: plistURL)
+    }
+
     var statusDescription: String {
-        switch SMAppService.mainApp.status {
-        case .enabled: return "로그인 시 자동으로 실행됩니다"
-        case .requiresApproval: return "시스템 설정에서 승인이 필요합니다"
-        case .notRegistered: return "자동 실행이 꺼져 있습니다"
-        case .notFound: return "등록 정보를 찾을 수 없습니다"
-        @unknown default: return ""
-        }
+        enabled ? "로그인 시 자동으로 실행됩니다" : "자동 실행이 꺼져 있습니다"
     }
 }
 
@@ -89,6 +113,11 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(Theme.orange)
                         .padding(.leading, 4)
+                } else if launchManager.enabled {
+                    Text("메뉴 막대 어시스턴트가 로그인 시 조용히 실행됩니다.")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                        .padding(.leading, 54)
                 }
 
                 Divider().opacity(0.4)

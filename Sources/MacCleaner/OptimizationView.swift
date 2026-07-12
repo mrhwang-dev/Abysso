@@ -25,7 +25,9 @@ final class OptimizationModel: ObservableObject {
         }
     }
 
-    @Published var section: Section = .login
+    @Published var section: Section = .login {
+        didSet { startAutoRefresh() }  // 섹션이 바뀌면 폴링 필요 여부 재평가
+    }
 
     // 로그인 항목 / 백그라운드 도구
     let agents = LaunchAgentManager()
@@ -39,9 +41,13 @@ final class OptimizationModel: ObservableObject {
 
     private var timer: Timer?
 
+    /// 프로세스 폴링이 필요한 섹션인지 (로그인 항목 섹션에선 ps를 돌릴 필요 없음)
+    private var needsProcessPolling: Bool {
+        section == .cpu || section == .running
+    }
+
     func onAppear() {
         if !agents.loaded { agents.load() }
-        refreshProcs()
         startAutoRefresh()
     }
 
@@ -52,12 +58,21 @@ final class OptimizationModel: ObservableObject {
 
     private func startAutoRefresh() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.refreshProcs() }
+        timer = nil
+        guard needsProcessPolling else { return }  // 불필요한 ps 호출 차단
+        refreshProcs()
+        let t = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, self.needsProcessPolling else { return }
+                self.refreshProcs()
+            }
         }
+        t.tolerance = 1.0  // ps 호출 발화를 최대 1초까지 묶음
+        timer = t
     }
 
     func refreshProcs() {
+        guard !loadingProcs else { return }  // 이전 폴링이 끝나기 전 중복 실행 방지
         loadingProcs = true
         Task.detached(priority: .utility) {
             let cpu = ProcessMonitor.topByCPU()
