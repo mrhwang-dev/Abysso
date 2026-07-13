@@ -10,6 +10,10 @@ struct CleanovaApp: App {
                 .frame(minWidth: 820, minHeight: 560)
         }
         .commands {
+            // 앱 메뉴(About Cleanova 바로 뒤)에 네이티브 '업데이트 확인…' 항목 추가
+            CommandGroup(after: .appInfo) {
+                CheckForUpdatesButton()
+            }
             CommandGroup(replacing: .appSettings) {
                 Button("환경설정…") {
                     NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
@@ -33,6 +37,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // 가장 먼저 오류 수집 초기화 (이후 발생하는 크래시를 포착하도록)
         Telemetry.start()
+
+        // 자동 업데이터 구동 (SPUStandardUpdaterController 생성)
+        _ = AppUpdater.shared
 
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
