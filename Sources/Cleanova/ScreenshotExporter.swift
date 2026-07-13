@@ -140,7 +140,7 @@ enum ScreenshotExporter {
     private static func desktopURL() -> URL {
         let fmt = DateFormatter()
         fmt.dateFormat = "yyyyMMdd-HHmm"
-        let name = "MacCleaner-탭모음-\(fmt.string(from: .now)).png"
+        let name = "Cleanova-탭모음-\(fmt.string(from: .now)).png"
         let desktop = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first
             ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
         return desktop.appendingPathComponent(name)

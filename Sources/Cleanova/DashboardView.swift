@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardView: View {
     @Binding var selection: SidebarItem?
     @StateObject private var monitor = SystemMonitor()
+    @Environment(\.scenePhase) private var scenePhase
     @State private var purging = false
     @State private var emptyingTrash = false
     @State private var actionMessage: String?
@@ -22,8 +23,13 @@ struct DashboardView: View {
             .padding(24)
         }
         .background(Theme.background)
-        .onAppear { monitor.start() }
+        // 화면에 보이고(onAppear) 앱이 활성(.active)일 때만 폴링.
+        // 탭 전환·창 최소화·다른 앱으로 전환 시 즉시 타이머 정지 → 백그라운드 CPU 0%.
+        .onAppear { if scenePhase == .active { monitor.start() } }
         .onDisappear { monitor.stop() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { monitor.start() } else { monitor.stop() }
+        }
     }
 
     // MARK: 헤더 — 실제 기기 정보

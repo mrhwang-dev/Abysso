@@ -57,7 +57,7 @@ struct FullDiskAccessSheet: View {
 
                 VStack(alignment: .leading, spacing: 10) {
                     step(1, "아래 버튼으로 시스템 설정을 엽니다")
-                    step(2, "목록에서 MacCleaner 스위치를 켭니다")
+                    step(2, "목록에서 Cleanova 스위치를 켭니다")
                     step(3, "안내에 따라 앱을 다시 실행합니다")
                 }
                 .padding(14)

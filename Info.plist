@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>MacCleaner</string>
+    <string>Cleanova</string>
     <key>CFBundleDisplayName</key>
-    <string>MacCleaner</string>
+    <string>Cleanova</string>
     <key>CFBundleIdentifier</key>
-    <string>com.cw.maccleaner</string>
+    <string>app.cleanova.mac</string>
     <key>CFBundleExecutable</key>
-    <string>MacCleaner</string>
+    <string>Cleanova</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

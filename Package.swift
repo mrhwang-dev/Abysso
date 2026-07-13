@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "MacCleaner",
+    name: "Cleanova",
     platforms: [.macOS(.v14)],
     targets: [
         .executableTarget(
-            name: "MacCleaner",
-            path: "Sources/MacCleaner",
+            name: "Cleanova",
+            path: "Sources/Cleanova",
             linkerSettings: [
                 .linkedFramework("IOKit"),
                 .linkedFramework("CoreServices"),
