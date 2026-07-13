@@ -72,6 +72,7 @@ final class LaunchAtLoginManager: ObservableObject {
 
 struct SettingsView: View {
     @StateObject private var launchManager = LaunchAtLoginManager()
+    @ObservedObject private var updater = AppUpdater.shared
     @AppStorage("menuBarEnabled") private var menuBarEnabled = true
     @AppStorage("fdaPromptSuppressed") private var fdaSuppressed = false
 
@@ -135,6 +136,28 @@ struct SettingsView: View {
 
                 Divider().opacity(0.4)
 
+                // 자동 업데이트
+                settingRow(
+                    icon: "arrow.down.circle", tint: Theme.green,
+                    title: "자동으로 업데이트 확인",
+                    subtitle: "새 버전이 나오면 백그라운드에서 확인합니다"
+                ) {
+                    Toggle("", isOn: Binding(
+                        get: { updater.automaticallyChecksForUpdates },
+                        set: { updater.automaticallyChecksForUpdates = $0 }
+                    ))
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                HStack {
+                    Spacer()
+                    CheckForUpdatesButton(title: "Cleanova 업데이트 확인")
+                        .controlSize(.small)
+                }
+                .padding(.leading, 54)
+
+                Divider().opacity(0.4)
+
                 // FDA 안내 재표시
                 settingRow(
                     icon: "lock.shield", tint: Theme.purple,
@@ -165,7 +188,7 @@ struct SettingsView: View {
             .padding(.horizontal, 12)
             .padding(.bottom, 6)
         }
-        .frame(width: 480, height: 360)
+        .frame(width: 480, height: 440)
         .background(Theme.bgTop)
         .preferredColorScheme(.dark)
         .onAppear { launchManager.refresh() }

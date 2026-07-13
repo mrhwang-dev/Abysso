@@ -22,5 +22,21 @@
     <true/>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
+
+    <!-- ===== Sparkle 자동 업데이트 ===== -->
+    <!-- 업데이트 정보를 담은 appcast.xml의 실제 주소로 교체하세요. -->
+    <key>SUFeedURL</key>
+    <string>https://yourwebsite.com/appcast.xml</string>
+
+    <!-- 업데이트 서명 검증용 EdDSA 공개키.
+         아직 키가 없으므로 비워둡니다. 배포 전 반드시 설정해야 합니다:
+           1) Sparkle 배포물의 bin/generate_keys 실행 → 키쌍 생성
+              (개인키는 macOS 키체인에 저장되고, 공개키 문자열이 출력됨)
+           2) 출력된 공개키를 아래 <string>에 넣기
+           3) 업데이트 zip은 bin/sign_update 로 서명해 appcast.xml의 sparkle:edSignature에 기입
+         공개키를 넣지 않으면 Sparkle이 서명을 검증할 수 없어 실제 업데이트 설치는 차단됩니다.
+         (지금은 뼈대 구축 단계이므로 확인 UI만 동작하고 다운로드/설치는 하지 않습니다.) -->
+    <!-- <key>SUPublicEDKey</key>
+    <string></string> -->
 </dict>
 </plist>
