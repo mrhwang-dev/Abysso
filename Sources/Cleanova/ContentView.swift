@@ -73,7 +73,7 @@ struct ContentView: View {
     @State private var showOnboarding = false
 
     // 전체 탭 캡처
-    enum CaptureState: Equatable { case idle, capturing, done(URL), noPermission, failed }
+    enum CaptureState: Equatable { case idle, capturing, done(URL), failed }
     @State private var captureState: CaptureState = .idle
 
     private static let sections: [(String, [SidebarItem])] = [
@@ -105,36 +105,16 @@ struct ContentView: View {
             .listStyle(.sidebar)
             .navigationSplitViewColumnWidth(min: 190, ideal: 210)
             .safeAreaInset(edge: .bottom) {
-                VStack(spacing: 8) {
-                    Button {
-                        captureAllTabs()
-                    } label: {
-                        if captureState == .capturing {
-                            HStack(spacing: 6) {
-                                ProgressView().controlSize(.small)
-                                Text("캡처 중…")
-                            }
-                            .frame(maxWidth: .infinity)
-                        } else {
-                            Label("전체 탭 캡처", systemImage: "camera.viewfinder")
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
-                    .controlSize(.small)
-                    .disabled(captureState == .capturing)
-                    .help("모든 탭을 자동으로 캡처해 데스크탑에 한 장의 이미지로 저장합니다")
-
-                    VStack(spacing: 2) {
-                        Image(systemName: "sparkles")
-                            .foregroundStyle(Theme.accentGradient)
-                        Text("Cleanova")
-                            .font(.caption.weight(.semibold))
-                        Text("v1.0 · 개인용")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
+                // 브랜드 푸터만 (캡처 버튼은 우측 상단 툴바로 이동)
+                VStack(spacing: 2) {
+                    Image(systemName: "sparkles")
+                        .foregroundStyle(Theme.accentGradient)
+                    Text("Cleanova")
+                        .font(.caption.weight(.semibold))
+                    Text("v1.0 · 개인용")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
                 }
-                .padding(.horizontal, 10)
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, 10)
             }
@@ -156,6 +136,27 @@ struct ContentView: View {
                 }
             }
             .transition(.opacity)
+            // 결과 배너는 디테일(메인 콘텐츠) 영역 안에서만 표시 → 사이드바를 가리지 않음
+            .overlay(alignment: .bottom) { captureBanner }
+            // 캡처 버튼은 네이티브 툴바 우측 상단으로 (플로팅 겹침 문제 원천 차단)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        captureAllTabs()
+                    } label: {
+                        if captureState == .capturing {
+                            HStack(spacing: 6) {
+                                ProgressView().controlSize(.small)
+                                Text("캡처 중…")
+                            }
+                        } else {
+                            Label("전체 탭 캡처", systemImage: "camera.viewfinder")
+                        }
+                    }
+                    .disabled(captureState == .capturing)
+                    .help("모든 탭을 자동으로 캡처해 데스크탑에 한 장의 이미지로 저장합니다")
+                }
+            }
         }
         .environmentObject(cacheModel)
         .environmentObject(lensModel)
@@ -172,7 +173,6 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
         .tint(Theme.teal)
         .animation(.easeInOut(duration: 0.2), value: selection)
-        .overlay(alignment: .bottom) { captureBanner }
         .sheet(isPresented: $showFDASheet) {
             FullDiskAccessSheet(isPresented: $showFDASheet)
         }
@@ -210,14 +210,6 @@ struct ContentView: View {
                     NSWorkspace.shared.activateFileViewerSelecting([url])
                 }
                 .buttonStyle(.link)
-                Button("닫기") { captureState = .idle }
-                    .buttonStyle(.plain).foregroundStyle(.secondary)
-            }
-        case .noPermission:
-            banner(icon: "exclamationmark.triangle.fill", tint: Theme.orange,
-                   text: "화면 기록 권한이 필요합니다. 허용 후 다시 시도하세요.") {
-                Button("설정 열기") { ScreenshotExporter.openScreenRecordingSettings() }
-                    .buttonStyle(.link)
                 Button("닫기") { captureState = .idle }
                     .buttonStyle(.plain).foregroundStyle(.secondary)
             }
@@ -262,7 +254,6 @@ struct ContentView: View {
             withAnimation {
                 switch result {
                 case .success(let url): captureState = .done(url)
-                case .noPermission: captureState = .noPermission
                 case .failed: captureState = .failed
                 }
             }

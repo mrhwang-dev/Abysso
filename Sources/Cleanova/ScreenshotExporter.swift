@@ -2,37 +2,27 @@ import AppKit
 import SwiftUI
 
 /// 모든 탭을 자동으로 순회하며 창을 캡처해 한 장의 그리드 이미지로 합친다.
+///
+/// 자기 앱의 창을 직접 렌더링(AppKit `cacheDisplay`)하므로 시스템 화면 기록 권한이
+/// 전혀 필요 없다. List·라이브 데이터·아이콘 등 실제 화면에 그려진 내용을 그대로 담는다.
 enum ScreenshotExporter {
     enum Result {
         case success(URL)
-        case noPermission
         case failed
     }
 
-    /// setSelection으로 각 탭을 표시시키고, 잠깐 렌더링을 기다린 뒤 창을 캡처.
+    /// setSelection으로 각 탭을 표시시키고, 렌더링을 기다린 뒤 창 내용을 캡처.
     @MainActor
     static func captureAllTabs(setSelection: @escaping (SidebarItem) -> Void) async -> Result {
         guard let window = mainWindow() else { return .failed }
-        window.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
-        let windowID = CGWindowID(window.windowNumber)
 
         var shots: [(String, NSImage)] = []
-        let tmp = FileManager.default.temporaryDirectory
-
         for (index, item) in SidebarItem.allCases.enumerated() {
             setSelection(item)
             // 탭 전환 애니메이션 + 초기 렌더가 끝나도록 대기
-            try? await Task.sleep(for: .milliseconds(index == 0 ? 500 : 650))
-
-            let path = tmp.appendingPathComponent("mc_tab_\(index).png")
-            try? FileManager.default.removeItem(at: path)
-            let ok = await captureWindow(windowID, to: path)
-            if ok, let img = NSImage(contentsOf: path) {
+            try? await Task.sleep(for: .milliseconds(index == 0 ? 450 : 550))
+            if let img = captureWindowContent(window) {
                 shots.append((item.rawValue, img))
-            } else if index == 0 {
-                // 첫 캡처부터 실패하면 대개 화면 기록 권한 문제
-                return .noPermission
             }
         }
 
@@ -49,7 +39,7 @@ enum ScreenshotExporter {
         }
     }
 
-    // MARK: 창 찾기 / 캡처
+    // MARK: 창 찾기 / 캡처 (권한 불필요)
 
     @MainActor
     private static func mainWindow() -> NSWindow? {
@@ -59,27 +49,18 @@ enum ScreenshotExporter {
             .max { $0.frame.width * $0.frame.height < $1.frame.width * $1.frame.height }
     }
 
-    private static func captureWindow(_ id: CGWindowID, to url: URL) async -> Bool {
-        await withCheckedContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                let p = Process()
-                p.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
-                // -x: 소리 없음, -o: 창 그림자 제외, -l: 특정 창 ID
-                p.arguments = ["-x", "-o", "-l", String(id), url.path]
-                do {
-                    try p.run()
-                    p.waitUntilExit()
-                } catch {
-                    continuation.resume(returning: false)
-                    return
-                }
-                let size = (try? FileManager.default.attributesOfItem(atPath: url.path))?[.size] as? Int ?? 0
-                let ok = p.terminationStatus == 0
-                    && FileManager.default.fileExists(atPath: url.path)
-                    && size > 0
-                continuation.resume(returning: ok)
-            }
-        }
+    /// 창의 contentView를 자체 렌더링해 비트맵으로. 화면 기록 권한이 필요 없다.
+    @MainActor
+    static func captureWindowContent(_ window: NSWindow) -> NSImage? {
+        guard let view = window.contentView else { return nil }
+        let bounds = view.bounds
+        guard bounds.width > 0, bounds.height > 0,
+              let rep = view.bitmapImageRepForCachingDisplay(in: bounds) else { return nil }
+        rep.size = bounds.size
+        view.cacheDisplay(in: bounds, to: rep)
+        let image = NSImage(size: bounds.size)
+        image.addRepresentation(rep)
+        return image
     }
 
     // MARK: 그리드 합성
@@ -120,13 +101,10 @@ enum ScreenshotExporter {
             let labelRect = NSRect(x: x, y: yTop - labelH, width: cellW, height: labelH)
             let imgRect = NSRect(x: x, y: yTop - labelH - cellH, width: cellW, height: cellH)
 
-            // 라벨
             (shot.0 as NSString).draw(
                 in: labelRect.insetBy(dx: 4, dy: 4), withAttributes: labelAttrs
             )
-            // 이미지 (셀에 맞춰 축소)
             shot.1.draw(in: imgRect, from: .zero, operation: .copy, fraction: 1)
-            // 이미지 테두리
             NSColor.white.withAlphaComponent(0.12).setStroke()
             let border = NSBezierPath(rect: imgRect)
             border.lineWidth = 1
@@ -144,12 +122,6 @@ enum ScreenshotExporter {
         let desktop = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first
             ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
         return desktop.appendingPathComponent(name)
-    }
-
-    static func openScreenRecordingSettings() {
-        NSWorkspace.shared.open(URL(
-            string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"
-        )!)
     }
 }
 

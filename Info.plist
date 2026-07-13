@@ -18,6 +18,16 @@
     <string>1</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
+    <!-- 기본 개발 언어 + 지원 언어 목록. 이 목록에 든 언어 중 사용자 Mac의
+         우선 언어로 AppKit 표준 메뉴(앱 정보/가리기/종료/편집/윈도우 등)가 자동 현지화됩니다.
+         (한국어 Mac이면 메뉴가 한국어로 표시됨) -->
+    <key>CFBundleDevelopmentRegion</key>
+    <string>ko</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>ko</string>
+        <string>en</string>
+    </array>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>CFBundleIconFile</key>
