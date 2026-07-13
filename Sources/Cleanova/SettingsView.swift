@@ -148,8 +148,24 @@ struct SettingsView: View {
             .padding(20)
 
             Spacer()
+
+            // 개발자용 — 오류 수집(Sentry) 연동 테스트. 배포 전 제거 예정.
+            HStack {
+                Spacer()
+                Button {
+                    fatalError("Sentry 연동 테스트 크래시")
+                } label: {
+                    Text("Test Crash")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.tertiary)
+                }
+                .buttonStyle(.plain)
+                .help("개발자용: 강제 크래시로 Sentry 오류 수집을 테스트합니다")
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 6)
         }
-        .frame(width: 480, height: 340)
+        .frame(width: 480, height: 360)
         .background(Theme.bgTop)
         .preferredColorScheme(.dark)
         .onAppear { launchManager.refresh() }
