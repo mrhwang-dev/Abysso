@@ -10,7 +10,7 @@ final class LaunchAtLoginManager: ObservableObject {
     @Published var enabled = false
     @Published var errorText: String?
 
-    static let label = "com.cw.maccleaner.launchatlogin"
+    static let label = "app.cleanova.mac"
 
     private var plistURL: URL {
         FileManager.default.homeDirectoryForCurrentUser
@@ -48,18 +48,18 @@ final class LaunchAtLoginManager: ObservableObject {
                 fromPropertyList: plist, format: .xml, options: 0
             )
             try data.write(to: plistURL)
-            // 즉시 등록 (다음 로그인까지 기다리지 않도록). 실패해도 파일은 남아 다음 로그인에 적용됨.
-            let uid = getuid()
-            _ = LaunchAgentManager.run("/bin/launchctl", ["bootout", "gui/\(uid)/\(Self.label)"])
-            _ = LaunchAgentManager.run("/bin/launchctl", ["bootstrap", "gui/\(uid)", plistURL.path])
+            // launchctl load로 즉시 등록 (다음 로그인까지 기다리지 않도록).
+            // 이미 로드돼 있을 수 있으니 먼저 unload 후 load (실패해도 파일은 남아 다음 로그인에 적용됨).
+            _ = LaunchAgentManager.run("/bin/launchctl", ["unload", plistURL.path])
+            _ = LaunchAgentManager.run("/bin/launchctl", ["load", "-w", plistURL.path])
         } catch {
             errorText = "자동 실행 설정에 실패했습니다: \(error.localizedDescription)"
         }
     }
 
     private func unregister() {
-        let uid = getuid()
-        _ = LaunchAgentManager.run("/bin/launchctl", ["bootout", "gui/\(uid)/\(Self.label)"])
+        // launchctl unload로 등록 해제 후 plist 삭제
+        _ = LaunchAgentManager.run("/bin/launchctl", ["unload", "-w", plistURL.path])
         try? FileManager.default.removeItem(at: plistURL)
     }
 
@@ -82,7 +82,7 @@ struct SettingsView: View {
                     .font(.system(size: 26))
                     .foregroundStyle(Theme.accentGradient)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text("MacCleaner 환경설정")
+                    Text("Cleanova 환경설정")
                         .font(.system(size: 17, weight: .bold, design: .rounded))
                     Text("버전 1.0 · 개인용")
                         .font(.caption)
@@ -97,7 +97,7 @@ struct SettingsView: View {
                 // 로그인 자동 실행
                 settingRow(
                     icon: "power", tint: Theme.blue,
-                    title: "로그인 시 MacCleaner 자동 실행",
+                    title: "로그인 시 Cleanova 자동 실행",
                     subtitle: launchManager.statusDescription
                 ) {
                     Toggle("", isOn: Binding(

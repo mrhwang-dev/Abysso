@@ -100,6 +100,7 @@ final class OptimizationModel: ObservableObject {
 
 struct OptimizationView: View {
     @EnvironmentObject private var model: OptimizationModel
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         VStack(spacing: 0) {
@@ -142,8 +143,11 @@ struct OptimizationView: View {
             }
         }
         .background(Theme.background)
-        .onAppear { model.onAppear() }
+        .onAppear { if scenePhase == .active { model.onAppear() } }
         .onDisappear { model.onDisappear() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { model.onAppear() } else { model.onDisappear() }
+        }
     }
 
     // MARK: 로그인 항목 + 백그라운드 도구

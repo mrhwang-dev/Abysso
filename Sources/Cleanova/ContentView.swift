@@ -68,7 +68,9 @@ struct ContentView: View {
     @StateObject private var extensionsModel = ExtensionsModel()
 
     @AppStorage("fdaPromptSuppressed") private var fdaSuppressed = false
+    @AppStorage("onboardingCompleted") private var onboardingCompleted = false
     @State private var showFDASheet = false
+    @State private var showOnboarding = false
 
     // 전체 탭 캡처
     enum CaptureState: Equatable { case idle, capturing, done(URL), noPermission, failed }
@@ -125,7 +127,7 @@ struct ContentView: View {
                     VStack(spacing: 2) {
                         Image(systemName: "sparkles")
                             .foregroundStyle(Theme.accentGradient)
-                        Text("MacCleaner")
+                        Text("Cleanova")
                             .font(.caption.weight(.semibold))
                         Text("v1.0 · 개인용")
                             .font(.caption2)
@@ -166,7 +168,7 @@ struct ContentView: View {
         .environmentObject(maintenanceModel)
         .environmentObject(updaterModel)
         .environmentObject(extensionsModel)
-        .navigationTitle("MacCleaner")
+        .navigationTitle("Cleanova")
         .preferredColorScheme(.dark)
         .tint(Theme.teal)
         .animation(.easeInOut(duration: 0.2), value: selection)
@@ -174,8 +176,16 @@ struct ContentView: View {
         .sheet(isPresented: $showFDASheet) {
             FullDiskAccessSheet(isPresented: $showFDASheet)
         }
+        .sheet(isPresented: $showOnboarding) {
+            OnboardingView(isPresented: $showOnboarding)
+                .interactiveDismissDisabled()
+        }
         .onAppear {
-            if !fdaSuppressed {
+            if !onboardingCompleted {
+                // 최초 실행: 온보딩(환영 → EULA → FDA)을 먼저 표시
+                showOnboarding = true
+            } else if !fdaSuppressed {
+                // 재실행: 권한이 없고 사용자가 억제하지 않았을 때만 FDA 안내
                 Task.detached(priority: .utility) {
                     let granted = Permissions.hasFullDiskAccess()
                     if !granted {

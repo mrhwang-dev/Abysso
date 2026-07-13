@@ -12,7 +12,7 @@ struct MenuBarView: View {
             // 헤더
             HStack {
                 Label {
-                    Text("MacCleaner")
+                    Text("Cleanova")
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                 } icon: {
                     Image(systemName: "sparkles")

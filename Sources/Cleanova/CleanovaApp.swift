@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct MacCleanerApp: App {
+struct CleanovaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
@@ -40,7 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = item.button {
-            let image = NSImage(systemSymbolName: "sparkles", accessibilityDescription: "MacCleaner")
+            let image = NSImage(systemSymbolName: "sparkles", accessibilityDescription: "Cleanova")
             image?.isTemplate = true  // 메뉴 막대 다크/라이트 자동 대응
             button.image = image
             button.action = #selector(togglePopover(_:))
