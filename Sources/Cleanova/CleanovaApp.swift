@@ -31,6 +31,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let popover = NSPopover()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // 가장 먼저 오류 수집 초기화 (이후 발생하는 크래시를 포착하도록)
+        Telemetry.start()
+
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
 
