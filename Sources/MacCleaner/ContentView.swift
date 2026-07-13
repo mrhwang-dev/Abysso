@@ -70,6 +70,10 @@ struct ContentView: View {
     @AppStorage("fdaPromptSuppressed") private var fdaSuppressed = false
     @State private var showFDASheet = false
 
+    // 전체 탭 캡처
+    enum CaptureState: Equatable { case idle, capturing, done(URL), noPermission, failed }
+    @State private var captureState: CaptureState = .idle
+
     private static let sections: [(String, [SidebarItem])] = [
         ("모니터링", [.dashboard]),
         ("정리", [.cache, .largeFiles, .oldFiles, .uninstall, .shredder]),
@@ -99,15 +103,36 @@ struct ContentView: View {
             .listStyle(.sidebar)
             .navigationSplitViewColumnWidth(min: 190, ideal: 210)
             .safeAreaInset(edge: .bottom) {
-                VStack(spacing: 2) {
-                    Image(systemName: "sparkles")
-                        .foregroundStyle(Theme.accentGradient)
-                    Text("MacCleaner")
-                        .font(.caption.weight(.semibold))
-                    Text("v1.0 · 개인용")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                VStack(spacing: 8) {
+                    Button {
+                        captureAllTabs()
+                    } label: {
+                        if captureState == .capturing {
+                            HStack(spacing: 6) {
+                                ProgressView().controlSize(.small)
+                                Text("캡처 중…")
+                            }
+                            .frame(maxWidth: .infinity)
+                        } else {
+                            Label("전체 탭 캡처", systemImage: "camera.viewfinder")
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .controlSize(.small)
+                    .disabled(captureState == .capturing)
+                    .help("모든 탭을 자동으로 캡처해 데스크탑에 한 장의 이미지로 저장합니다")
+
+                    VStack(spacing: 2) {
+                        Image(systemName: "sparkles")
+                            .foregroundStyle(Theme.accentGradient)
+                        Text("MacCleaner")
+                            .font(.caption.weight(.semibold))
+                        Text("v1.0 · 개인용")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
                 }
+                .padding(.horizontal, 10)
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, 10)
             }
@@ -145,6 +170,7 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
         .tint(Theme.teal)
         .animation(.easeInOut(duration: 0.2), value: selection)
+        .overlay(alignment: .bottom) { captureBanner }
         .sheet(isPresented: $showFDASheet) {
             FullDiskAccessSheet(isPresented: $showFDASheet)
         }
@@ -156,6 +182,82 @@ struct ContentView: View {
                         await MainActor.run { showFDASheet = true }
                     }
                 }
+            }
+        }
+    }
+
+    // MARK: 전체 탭 캡처 결과 배너
+
+    @ViewBuilder
+    private var captureBanner: some View {
+        switch captureState {
+        case .idle, .capturing:
+            EmptyView()
+        case .done(let url):
+            banner(icon: "checkmark.circle.fill", tint: Theme.green,
+                   text: "데스크탑에 저장했습니다 · \(url.lastPathComponent)") {
+                Button("Finder에서 보기") {
+                    NSWorkspace.shared.activateFileViewerSelecting([url])
+                }
+                .buttonStyle(.link)
+                Button("닫기") { captureState = .idle }
+                    .buttonStyle(.plain).foregroundStyle(.secondary)
+            }
+        case .noPermission:
+            banner(icon: "exclamationmark.triangle.fill", tint: Theme.orange,
+                   text: "화면 기록 권한이 필요합니다. 허용 후 다시 시도하세요.") {
+                Button("설정 열기") { ScreenshotExporter.openScreenRecordingSettings() }
+                    .buttonStyle(.link)
+                Button("닫기") { captureState = .idle }
+                    .buttonStyle(.plain).foregroundStyle(.secondary)
+            }
+        case .failed:
+            banner(icon: "xmark.circle.fill", tint: Theme.red,
+                   text: "캡처에 실패했습니다.") {
+                Button("닫기") { captureState = .idle }
+                    .buttonStyle(.plain).foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func banner<Trailing: View>(
+        icon: String, tint: Color, text: String,
+        @ViewBuilder trailing: () -> Trailing
+    ) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon).foregroundStyle(tint)
+            Text(text).font(.callout)
+            Spacer()
+            trailing()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(tint.opacity(0.4), lineWidth: 1))
+        .padding(16)
+        .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+
+    // MARK: 캡처 실행
+
+    private func captureAllTabs() {
+        let saved = selection
+        withAnimation { captureState = .capturing }
+        Task {
+            let result = await ScreenshotExporter.captureAllTabs { item in
+                selection = item
+            }
+            selection = saved
+            withAnimation {
+                switch result {
+                case .success(let url): captureState = .done(url)
+                case .noPermission: captureState = .noPermission
+                case .failed: captureState = .failed
+                }
+            }
+            if case .done(let url) = captureState {
+                NSWorkspace.shared.activateFileViewerSelecting([url])
             }
         }
     }
