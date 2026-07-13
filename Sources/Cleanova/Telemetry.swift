@@ -6,17 +6,19 @@ import Sentry
 /// 원격 오류/크래시 수집 (Sentry). 패키지가 없으면(canImport 실패) 전부 no-op이 되어
 /// 앱은 문제없이 빌드·실행된다.
 enum Telemetry {
-    /// 실제 배포 전 Sentry 대시보드에서 발급받은 DSN으로 교체하세요.
-    static let dsn = "YOUR_SENTRY_DSN_HERE"
+    /// Sentry 대시보드에서 발급받은 DSN.
+    static let dsn = "https://23a80b1f3f74958d1288984466abfef0@o4511726173159424.ingest.us.sentry.io/4511726200291333"
 
     static func start() {
         #if canImport(Sentry)
-        // 플레이스홀더 DSN이면 초기화를 건너뛴다 (개발 중 불필요한 전송 방지).
-        guard dsn != "YOUR_SENTRY_DSN_HERE", !dsn.isEmpty else { return }
+        guard !dsn.isEmpty, dsn != "YOUR_SENTRY_DSN_HERE" else { return }
         SentrySDK.start { options in
             options.dsn = dsn
-            options.debug = false
-            // 성능 트레이싱 표본 비율 (0.0~1.0). 필요 시 조정.
+            // 설치 초기에는 로그를 남겨 연동을 확인하기 좋다. 안정화되면 false로.
+            options.debug = true
+            // 사용자 IP 등 기본 개인정보 포함 (Sentry 권장 설정).
+            options.sendDefaultPii = true
+            // 성능 트레이싱 표본 비율 (0.0~1.0).
             options.tracesSampleRate = 0.2
             #if DEBUG
             options.environment = "development"

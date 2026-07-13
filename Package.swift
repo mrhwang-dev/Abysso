@@ -6,7 +6,7 @@ let package = Package(
     platforms: [.macOS(.v14)],
     dependencies: [
         // 원격 오류/크래시 수집. 실제 배포 전 DSN을 발급받아 설정하세요.
-        .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.0.0"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "9.21.0"),
     ],
     targets: [
         .executableTarget(
