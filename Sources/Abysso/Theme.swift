@@ -37,6 +37,15 @@ enum Theme {
         LinearGradient(colors: [blue, teal], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
+    /// 대시보드(메인 화면) 전용 배경 — 상단에 보라 글로우가 감도는 깊은 그라디언트.
+    /// 정보 위주의 다른 탭(짙은 네이비)과 달리 첫 화면에 생기를 준다.
+    static var heroBackground: LinearGradient {
+        LinearGradient(
+            colors: [Color(hex: 0x2E2266), Color(hex: 0x1A163A), bgBottom],
+            startPoint: .top, endPoint: .bottom
+        )
+    }
+
     /// 사용률(0~1)에 따른 상태 색: 녹색 → 황색 → 적색
     static func statusColor(_ fraction: Double) -> Color {
         if fraction > 0.85 { return red }
@@ -95,6 +104,49 @@ extension View {
 
     func glassCard(padding: CGFloat = 14, cornerRadius: CGFloat = 14) -> some View {
         modifier(GlassCardStyle(padding: padding, cornerRadius: cornerRadius))
+    }
+}
+
+// MARK: - 히어로 카드 (메인 화면용 대형 광택 카드)
+
+/// CleanMyMac 스타일의 크고 화사한 카드 — 좌상단 라벨, 큰 수치, 우상단 광택 아이콘,
+/// 카드별 색상 그라디언트 배경. 대시보드 첫인상을 살린다.
+struct HeroCard<Content: View>: View {
+    let tint: Color
+    let icon: String
+    @ViewBuilder var content: () -> Content
+
+    var body: some View {
+        content()
+            .frame(maxWidth: .infinity, minHeight: 150, alignment: .topLeading)
+            .padding(18)
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .fill(LinearGradient(
+                            colors: [tint.opacity(0.32), tint.opacity(0.06)],
+                            startPoint: .topLeading, endPoint: .bottomTrailing
+                        ))
+                }
+            )
+            .overlay(alignment: .topTrailing) {
+                // 3D 광택 아이콘 근사 — 큰 심볼 + 밝은 그라디언트 + 소프트 글로우
+                Image(systemName: icon)
+                    .font(.system(size: 42, weight: .semibold))
+                    .foregroundStyle(LinearGradient(
+                        colors: [.white, tint],
+                        startPoint: .top, endPoint: .bottom
+                    ))
+                    .shadow(color: tint.opacity(0.6), radius: 14, y: 3)
+                    .padding(18)
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.28), radius: 14, y: 8)
     }
 }
 
