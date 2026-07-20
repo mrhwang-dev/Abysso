@@ -220,7 +220,7 @@
 
 /* ===== Delay notice (long scans/tasks) ===== */
 "%lld초 경과" = "%lld seconds elapsed";
-"%lld개 파일 검사함" = "%lld files inspected";
+"%@개 파일 검사함" = "%@ files inspected";
 "파일 용량이 커서 분석이 지연되고 있습니다" = "Analysis is taking longer because of large file sizes";
 "처리할 항목이 많아 검사가 지연되고 있습니다" = "The check is taking longer because there are many items to process";
 "서버 응답을 기다리는 중입니다 — 네트워크 상태에 따라 수십 초 걸릴 수 있습니다" = "Waiting for the server — this can take tens of seconds depending on your network";
@@ -431,7 +431,7 @@
 "version.freeBeta" = "Abysso v%@ (Free Beta)";
 
 /* ===== Recent Additions ===== */
-"계산 중..." = "Calculating...";
+"계산 중..." = "Calculating…";
 "곧 완료됨" = "Almost done";
 "약 %d초 남음" = "About %d sec left";
 "약 %d분 %d초 남음" = "About %d min %d sec left";

@@ -237,13 +237,30 @@ final class LargeFilesModel: ObservableObject {
     /// 검사한 파일 수를 배치(수천 개) 단위로 알려주는 진행 콜백
     typealias ScanProgress = @Sendable (Int) -> Void
 
-    /// 진행 상황 표시용 — 지금까지 검사한 파일 수 (배치 단위로만 갱신되어 UI 부담 없음)
+    /// 진행 상황 표시용 — 지금까지 검사한 파일 수.
+    /// 병렬 서브트리들이 배치를 매우 자주 보내와 매번 @Published로 반영하면
+    /// 숫자 애니메이션이 쉴 새 없이 재시작돼 표기가 뒤섞여 보인다.
+    /// 누적은 pendingCount에 하고 화면 반영은 0.2초 간격으로만 한다.
     @Published var scannedCount = 0
+    private var pendingCount = 0
+    private var lastCountFlush = Date.distantPast
+
+    /// 배치 누적 + 0.2초 스로틀로 화면 반영
+    private func accumulateScanned(_ batch: Int) {
+        pendingCount += batch
+        let now = Date()
+        if now.timeIntervalSince(lastCountFlush) >= 0.2 {
+            scannedCount = pendingCount
+            lastCountFlush = now
+        }
+    }
 
     func scan() {
         scanning = true
         lastCleaned = nil
         scannedCount = 0
+        pendingCount = 0
+        lastCountFlush = .distantPast
         // 통합 스캔: '오래된 대용량 파일' 스코프도 같은 데이터를 쓰므로
         // 사용자가 고른 최소 크기와 무관하게 항상 50MB 바닥값으로 수집한다.
         let minBytes = min(Int64(minSizeMB) * 1_000_000, Self.oldFilesMinBytes)
@@ -252,9 +269,11 @@ final class LargeFilesModel: ObservableObject {
             let disk = SystemProbe.disk()
             let result = await Self.findLargeFiles(minBytes: minBytes, skipLibrary: skipLibrary) { batch in
                 // 파일마다가 아니라 수천 개 단위 배치로만 메인 스레드에 반영
-                Task { @MainActor in self.scannedCount += batch }
+                Task { @MainActor in self.accumulateScanned(batch) }
             }
             await MainActor.run {
+                // 스로틀로 미반영된 잔여분까지 최종 수치로 확정
+                self.scannedCount = self.pendingCount
                 withAnimation(.easeOut(duration: 0.4)) {
                     self.diskUsed = max(disk.total - disk.free, 1)
                     self.allFiles = result
@@ -487,10 +506,10 @@ struct LargeFilesView: View {
                         .controlSize(.large)
                     Text("홈 폴더를 스캔하는 중… 파일이 많으면 시간이 걸립니다")
                         .foregroundStyle(.secondary)
-                    // 실시간 진행 카운트 (2,000개 배치 단위로만 갱신)
+                    // 실시간 진행 카운트 — 0.2초 스로틀 + 천 단위 구분자로 읽기 좋게
                     if model.scannedCount > 0 {
-                        Text(String(format: NSLocalizedString("%lld개 파일 검사함", comment: ""),
-                                    Int64(model.scannedCount)))
+                        Text(String(format: NSLocalizedString("%@개 파일 검사함", comment: ""),
+                                    model.scannedCount.formatted()))
                             .font(.callout)
                             .monospacedDigit()
                             .foregroundStyle(.tertiary)
