@@ -143,12 +143,14 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showBugReport) {
             BugReportView()
+                .dismissOnOutsideClick()
         }
         .preferredColorScheme(.dark)
         .tint(Theme.teal)
         .animation(.easeInOut(duration: 0.2), value: selection)
         .sheet(isPresented: $showFDASheet) {
             FullDiskAccessSheet(isPresented: $showFDASheet)
+                .dismissOnOutsideClick()
         }
         .sheet(isPresented: $showOnboarding) {
             OnboardingView(isPresented: $showOnboarding)

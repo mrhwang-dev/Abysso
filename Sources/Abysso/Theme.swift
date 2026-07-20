@@ -163,6 +163,52 @@ extension View {
     }
 }
 
+// MARK: - 시트 바깥 클릭으로 닫기
+
+/// macOS 시트는 기본적으로 바깥(부모 창)을 클릭해도 닫히지 않는다.
+/// 이 수정자를 시트 콘텐츠에 붙이면, 시트가 떠 있는 동안 부모 창을 클릭했을 때
+/// 시트가 닫힌다. (메뉴 막대·다른 앱 클릭에는 반응하지 않도록 부모 창만 정확히 판별)
+struct DismissOnOutsideClick: ViewModifier {
+    @Environment(\.dismiss) private var dismiss
+    @State private var monitor: Any?
+    @State private var hostWindow: NSWindow?
+
+    func body(content: Content) -> some View {
+        content
+            .background(SheetWindowReader { hostWindow = $0 })
+            .onAppear {
+                monitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { event in
+                    // 시트의 부모 창을 클릭했을 때만 닫는다
+                    if let sheet = hostWindow, let parent = sheet.sheetParent, event.window === parent {
+                        dismiss()
+                    }
+                    return event
+                }
+            }
+            .onDisappear {
+                if let m = monitor { NSEvent.removeMonitor(m); monitor = nil }
+            }
+    }
+}
+
+/// 붙어 있는 NSWindow(시트 창)를 알아내는 도우미
+private struct SheetWindowReader: NSViewRepresentable {
+    var onWindow: (NSWindow) -> Void
+    func makeNSView(context: Context) -> NSView {
+        let v = NSView()
+        DispatchQueue.main.async { if let w = v.window { onWindow(w) } }
+        return v
+    }
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async { if let w = nsView.window { onWindow(w) } }
+    }
+}
+
+extension View {
+    /// 시트 콘텐츠에 붙이면 부모 창 클릭 시 시트가 닫힌다
+    func dismissOnOutsideClick() -> some View { modifier(DismissOnOutsideClick()) }
+}
+
 // MARK: - 히어로 카드 (메인 화면용 대형 광택 카드)
 
 /// CleanMyMac 스타일의 크고 화사한 카드 — 좌상단 라벨, 큰 수치, 우상단 광택 아이콘,

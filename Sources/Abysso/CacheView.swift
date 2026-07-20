@@ -552,6 +552,7 @@ struct CacheView: View {
             set: { browsing = $0?.url }
         )) { target in
             FolderBrowserSheet(root: target.url)
+                .dismissOnOutsideClick()
         }
     }
 
