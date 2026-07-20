@@ -29,14 +29,15 @@ enum Telemetry {
         #endif
     }
 
-    /// 인앱 버그 제보를 Sentry로 전송한다. 사용자가 적은 내용을 이벤트 메시지로,
-    /// (선택) 이메일은 사용자 정보로 첨부해 대시보드에서 회신할 수 있게 한다.
+    /// 인앱 피드백(버그 제보/기능 추가 요청)을 Sentry로 전송한다. 사용자가 적은 내용을
+    /// 이벤트 메시지로, (선택) 이메일은 사용자 정보로 첨부해 대시보드에서 회신할 수 있게 한다.
     /// Sentry 패키지가 없으면 no-op이라 앱은 문제없이 빌드된다.
-    static func reportBug(message: String, email: String) {
+    static func reportBug(message: String, email: String, isFeatureRequest: Bool = false) {
         #if canImport(Sentry)
-        SentrySDK.capture(message: "🐞 사용자 버그 제보\n\n\(message)") { scope in
+        let prefix = isFeatureRequest ? "💡 기능 추가 요청" : "🐞 사용자 버그 제보"
+        SentrySDK.capture(message: "\(prefix)\n\n\(message)") { scope in
             scope.setLevel(.info)
-            scope.setTag(value: "user-report", key: "report.type")
+            scope.setTag(value: isFeatureRequest ? "feature-request" : "user-report", key: "report.type")
             let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
             if !trimmedEmail.isEmpty {
                 let user = User()

@@ -93,10 +93,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// 앱에서 쓰지 않는 기본 템플릿 메뉴의 (언어별) 제목 — 편집·윈도우는 남긴다.
     /// 편집은 텍스트 입력 단축키(Cmd+C/V)에, 윈도우는 창 전환·Cmd+W에 필요하다.
     private static let removableMenuTitles: Set<String> = [
-        "파일", "File", "ファイル", "檔案",
-        "포맷", "Format", "フォーマット", "格式",
-        "보기", "View", "表示", "顯示方式",
-        "도움말", "Help", "ヘルプ", "輔助說明",
+        "파일", "File", "ファイル",
+        "포맷", "Format", "フォーマット",
+        "보기", "View", "表示",
+        "도움말", "Help", "ヘルプ",
     ]
 
     /// 템플릿 메뉴를 제목 기준으로 제거하고, 파일 메뉴와 함께 사라진

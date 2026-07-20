@@ -17,7 +17,7 @@ def load_strings(path):
 
 en_strings = load_strings('Resources/en.lproj/Localizable.strings')
 
-langs = ['ja', 'zh-Hant']
+langs = ['ja']
 errors = 0
 
 for lang in langs:

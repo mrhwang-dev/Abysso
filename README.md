@@ -2,12 +2,12 @@
 
 **한국어** | [English](README.en.md)
 
-macOS 개인 정리 유틸리티. 캐시·대용량 파일·앱 잔여물을 안전하게 찾아 정리한다. **무료 베타** — 계정·구독 없이 쓸 수 있고, 모든 삭제는 휴지통을 거치며(완전 삭제 제외), 다크 전용 테마와 7개 언어 UI를 지원한다.
+macOS 개인 정리 유틸리티. 캐시·대용량 파일·앱 잔여물을 안전하게 찾아 정리한다. **무료 베타** — 계정·구독 없이 쓸 수 있고, 모든 삭제는 휴지통을 거치며(완전 삭제 제외), 다크 전용 테마와 3개 언어 UI를 지원한다.
 
 - **버전:** v0.0.1 (Free Beta)
 - **번들 ID:** `app.abysso.mac`
 - **플랫폼:** macOS (Apple Silicon), SwiftUI + Swift Package Manager
-- **웹사이트:** [abysso-ten.vercel.app](https://abysso-ten.vercel.app) (7개 언어 랜딩 페이지, `web/`)
+- **웹사이트:** [abysso-ten.vercel.app](https://abysso-ten.vercel.app) (3개 언어 랜딩 페이지, `web/`)
 
 ![시스템 현황 대시보드](docs/screenshots/dashboard.png)
 
@@ -49,9 +49,9 @@ macOS 개인 정리 유틸리티. 캐시·대용량 파일·앱 잔여물을 안
 
 ## 언어
 
-한국어 · English · 日本語 · 繁體中文 · Deutsch · Español · Français (7개 언어)
+한국어 · English · 日本語 (3개 언어)
 
-`Resources/{ko,en,ja,zh-Hant,de,es,fr}.lproj/Localizable.strings`. 영어(`en`) 파일이 전체 키의 슈퍼셋 템플릿이며, 번역 정합성은 `python3 validate_strings.py`로 검사한다.
+`Resources/{ko,en,ja}.lproj/Localizable.strings`. 영어(`en`) 파일이 전체 키의 슈퍼셋 템플릿이며, 번역 정합성은 `python3 validate_strings.py`로 검사한다.
 
 ## 빌드
 
@@ -74,7 +74,7 @@ Sources/Abysso/       # 앱 소스 (SwiftUI 뷰 + 모델, 31개 파일)
   Theme.swift         # 다크 테마 + 공용 컴포넌트
   ...
 Resources/*.lproj/    # 다국어 문자열
-web/                  # 랜딩 페이지 (7개 언어, Vercel 배포 — Root Directory: web)
+web/                  # 랜딩 페이지 (3개 언어, Vercel 배포 — Root Directory: web)
 Tools/                # 아이콘·DMG 배경 생성기
 Info.plist            # 번들 설정 (Sparkle 공개키 등)
 build-app.sh          # 빌드 스크립트

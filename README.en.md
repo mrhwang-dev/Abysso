@@ -2,12 +2,12 @@
 
 [한국어](README.md) | **English**
 
-A personal cleaning utility for macOS. Safely find and clean caches, large files, and app leftovers. **Free beta** — no account or subscription required. All deletions go through the Trash (except Delete Completely), with a dark-only theme and a 7-language UI.
+A personal cleaning utility for macOS. Safely find and clean caches, large files, and app leftovers. **Free beta** — no account or subscription required. All deletions go through the Trash (except Delete Completely), with a dark-only theme and a 3-language UI.
 
 - **Version:** v0.0.1 (Free Beta)
 - **Bundle ID:** `app.abysso.mac`
 - **Platform:** macOS (Apple Silicon), SwiftUI + Swift Package Manager
-- **Website:** [abysso-ten.vercel.app](https://abysso-ten.vercel.app) (7-language landing page, `web/`)
+- **Website:** [abysso-ten.vercel.app](https://abysso-ten.vercel.app) (3-language landing page, `web/`)
 
 ![System Status dashboard](docs/screenshots/dashboard.png)
 
@@ -49,9 +49,9 @@ Also: menu bar assistant (popover), launch at login, low-RAM alerts, Sparkle aut
 
 ## Languages
 
-한국어 · English · 日本語 · 繁體中文 · Deutsch · Español · Français (7 languages)
+한국어 · English · 日本語 (3 languages)
 
-`Resources/{ko,en,ja,zh-Hant,de,es,fr}.lproj/Localizable.strings`. The English (`en`) file is the superset template of all keys; translation consistency is checked with `python3 validate_strings.py`.
+`Resources/{ko,en,ja}.lproj/Localizable.strings`. The English (`en`) file is the superset template of all keys; translation consistency is checked with `python3 validate_strings.py`.
 
 ## Build
 
@@ -74,7 +74,7 @@ Sources/Abysso/       # app source (SwiftUI views + models)
   Theme.swift         # dark theme + shared components
   ...
 Resources/*.lproj/    # localized strings
-web/                  # landing page (7 languages, deployed on Vercel — Root Directory: web)
+web/                  # landing page (3 languages, deployed on Vercel — Root Directory: web)
 Tools/                # icon & DMG background generators
 Info.plist            # bundle config (Sparkle public key, etc.)
 build-app.sh          # build script

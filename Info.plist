@@ -17,16 +17,15 @@
 		<string>ko</string>
 		<string>en</string>
 		<string>ja</string>
-		<string>zh-Hant</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>Abysso</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.0.3</string>
+	<string>0.0.4</string>
 	<key>CFBundleVersion</key>
-	<string>0.0.3</string>
+	<string>0.0.4</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
 	<key>NSDesktopFolderUsageDescription</key>

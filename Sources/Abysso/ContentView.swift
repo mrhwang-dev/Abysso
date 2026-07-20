@@ -135,10 +135,10 @@ struct ContentView: View {
                 Button { showBugReport = true } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "ladybug")
-                        Text("버그 제보")
+                        Text("버그 제보 · 기능 요청")
                     }
                 }
-                .help("버그 제보")
+                .help("버그 제보 · 기능 요청")
             }
         }
         .sheet(isPresented: $showBugReport) {
