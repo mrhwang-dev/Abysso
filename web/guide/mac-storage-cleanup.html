@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>맥 용량 정리하는 법 — 맥북 저장공간 확보 완벽 가이드 (2026) | Abysso</title>
+<meta name="description" content="맥북 저장공간이 부족하다면? 캐시 정리, 대용량 파일 찾기, 앱 완전 삭제, 시스템 데이터 줄이기까지 — 맥 용량 정리 방법을 단계별로 정리했습니다. 무료 도구 Abysso로 한 번에 해결하세요.">
+<link rel="canonical" href="https://abysso-ten.vercel.app/guide/mac-storage-cleanup.html">
+<meta property="og:title" content="맥 용량 정리하는 법 — 맥북 저장공간 확보 완벽 가이드">
+<meta property="og:description" content="캐시 정리부터 대용량 파일 찾기, 앱 완전 삭제까지 — 맥 저장공간을 되찾는 모든 방법.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://abysso-ten.vercel.app/guide/mac-storage-cleanup.html">
+<meta property="og:image" content="https://abysso-ten.vercel.app/screenshots/dashboard.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "맥 용량 정리하는 법 — 맥북 저장공간 확보 완벽 가이드",
+  "description": "캐시 정리, 대용량 파일 찾기, 앱 완전 삭제, 시스템 데이터 줄이기까지 맥 저장공간을 되찾는 방법을 단계별로 정리한 가이드.",
+  "image": "https://abysso-ten.vercel.app/screenshots/dashboard.png",
+  "author": { "@type": "Organization", "name": "Abysso" },
+  "publisher": { "@type": "Organization", "name": "Abysso" },
+  "inLanguage": "ko",
+  "mainEntityOfPage": "https://abysso-ten.vercel.app/guide/mac-storage-cleanup.html"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "맥에서 '기타' 또는 '시스템 데이터' 용량이 너무 큰데 지워도 되나요?",
+      "acceptedAnswer": { "@type": "Answer", "text": "시스템 데이터의 대부분은 앱 캐시, 로그, 오래된 iOS 백업, Time Machine 로컬 스냅샷입니다. 캐시와 로그는 지워도 안전하며 필요하면 앱이 다시 생성합니다. 다만 무엇인지 모르는 시스템 파일을 직접 지우는 것은 위험하므로, 안전한 항목만 골라주는 정리 도구를 쓰는 것이 좋습니다." }
+    },
+    {
+      "@type": "Question",
+      "name": "맥 캐시 파일을 지우면 문제가 생기지 않나요?",
+      "acceptedAnswer": { "@type": "Answer", "text": "캐시는 앱이 빠르게 동작하도록 임시로 저장해 두는 파일이라 지워도 안전합니다. 필요해지면 앱이 자동으로 다시 만듭니다. 단, 실행 중인 앱의 캐시를 지우면 곧바로 다시 생기므로 효과가 적고, 개발 도구 캐시는 다음 빌드가 느려질 수 있습니다." }
+    },
+    {
+      "@type": "Question",
+      "name": "앱을 휴지통에 넣으면 완전히 삭제되나요?",
+      "acceptedAnswer": { "@type": "Answer", "text": "아닙니다. 앱 본체만 지워지고 캐시·설정·지원 파일이 라이브러리 폴더에 수백 MB씩 남는 경우가 많습니다. 앱과 관련 파일을 함께 지워주는 앱 제거 도구를 사용하면 잔여물 없이 깨끗하게 삭제할 수 있습니다." }
+    },
+    {
+      "@type": "Question",
+      "name": "무료 맥 정리 프로그램도 안전한가요?",
+      "acceptedAnswer": { "@type": "Answer", "text": "삭제 방식이 투명한 도구를 고르면 됩니다. 삭제가 휴지통을 거쳐 복구 가능한지, 무엇을 지우는지 미리 보여주는지 확인하세요. Abysso는 무료 베타이며 완전 삭제 기능을 제외한 모든 삭제가 휴지통을 거치므로 언제든 되돌릴 수 있습니다." }
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --bg:#0A0F1A; --card:#161c2e;
+    --teal:#2DD4BF; --purple:#A78BFA; --blue:#4C8DFF; --orange:#FF9F43;
+    --text:#EAECF2; --muted:#9AA3B2; --line:rgba(255,255,255,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",Roboto,sans-serif;
+    line-height:1.75;-webkit-font-smoothing:antialiased}
+  a{color:var(--teal);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .bg{position:fixed;inset:0;z-index:-1;background:
+      radial-gradient(50% 35% at 50% -5%, rgba(124,92,242,.25), transparent 70%),
+      linear-gradient(180deg,#191537 0%, #100e1f 30%, var(--bg) 100%);}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:17px;color:var(--text)}
+  .brand .mark{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--blue),var(--teal));font-size:15px}
+  .navlink{color:var(--muted);font-size:13.5px}
+
+  article{padding:28px 0 60px}
+  h1{font-size:clamp(26px,5vw,36px);font-weight:800;letter-spacing:-.8px;line-height:1.25;
+    background:linear-gradient(180deg,#fff,#c9c4ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{margin-top:14px;color:var(--muted);font-size:16.5px}
+  .updated{margin-top:10px;font-size:12.5px;color:var(--muted);opacity:.75}
+  h2{font-size:21px;font-weight:800;margin:44px 0 12px;letter-spacing:-.3px}
+  h2 .num{color:var(--teal);margin-right:6px}
+  h3{font-size:16.5px;font-weight:700;margin:22px 0 8px}
+  p{margin:10px 0;color:#d6dae3;font-size:15.5px}
+  ul,ol{margin:10px 0 10px 22px;color:#d6dae3;font-size:15.5px}
+  li{margin:5px 0}
+  code{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:6px;
+    padding:1px 7px;font-size:13.5px;font-family:ui-monospace,SF Mono,Menlo,monospace}
+  .tip{background:linear-gradient(135deg,rgba(45,212,191,.10),rgba(76,141,255,.06));
+    border:1px solid rgba(45,212,191,.28);border-radius:12px;padding:14px 16px;margin:16px 0;font-size:14.5px}
+  .tip b{color:var(--teal)}
+  .warn{background:rgba(255,159,67,.08);border:1px solid rgba(255,159,67,.3);
+    border-radius:12px;padding:14px 16px;margin:16px 0;font-size:14.5px}
+  .warn b{color:var(--orange)}
+  .shot{margin:18px 0;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  .shot img{display:block;width:100%;height:auto}
+  .toc{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;
+    padding:16px 20px;margin:26px 0;font-size:14.5px}
+  .toc b{display:block;margin-bottom:6px;color:var(--text)}
+  .toc ol{margin-left:18px}
+
+  .cta{margin:40px 0;text-align:center;background:linear-gradient(135deg,rgba(76,141,255,.12),rgba(45,212,191,.10));
+    border:1px solid rgba(45,212,191,.3);border-radius:16px;padding:28px 22px}
+  .cta h2{margin:0 0 8px;font-size:20px}
+  .cta p{color:var(--muted);font-size:14.5px}
+  .btn{display:inline-block;margin-top:14px;padding:12px 26px;border-radius:12px;font-weight:700;font-size:15px;
+    background:linear-gradient(135deg,var(--blue),var(--teal));color:#06121a}
+  .btn:hover{text-decoration:none;filter:brightness(1.06)}
+
+  .faq{border-top:1px solid var(--line);margin-top:44px;padding-top:8px}
+  .faq h2{margin-top:26px}
+  .faq h3{color:var(--teal)}
+  footer{border-top:1px solid var(--line);padding:26px 0 50px;color:var(--muted);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<div class="wrap">
+  <header>
+    <a class="brand" href="../"><span class="mark">✦</span> Abysso</a>
+    <a class="navlink" href="../">← 홈</a>
+  </header>
+
+  <article>
+    <h1>맥 용량 정리하는 법 — 맥북 저장공간 확보 완벽 가이드</h1>
+    <p class="lede">맥북 저장공간이 늘 부족한가요? 캐시와 로그, 정체 모를 대용량 파일, 지운 줄 알았던 앱의 잔여물까지 —
+      맥 용량을 잡아먹는 주범을 찾아 안전하게 정리하는 방법을 단계별로 정리했습니다.</p>
+    <p class="updated">마지막 업데이트: 2026년 7월 · 읽는 시간 약 6분</p>
+
+    <div class="toc">
+      <b>목차</b>
+      <ol>
+        <li><a href="#check">내 맥 용량, 뭐가 차지하고 있는지 확인하기</a></li>
+        <li><a href="#cache">캐시·로그 정리 — 가장 쉽고 안전한 첫 단계</a></li>
+        <li><a href="#large">대용량 파일 찾기 — 몇 GB를 한 번에</a></li>
+        <li><a href="#uninstall">앱 '완전' 삭제 — 잔여물까지</a></li>
+        <li><a href="#basics">기본기 — 휴지통·다운로드·아이폰 백업</a></li>
+        <li><a href="#system">'시스템 데이터'가 수십 GB일 때</a></li>
+        <li><a href="#auto">이 모든 걸 한 번에 — 자동화</a></li>
+        <li><a href="#faq">자주 묻는 질문</a></li>
+      </ol>
+    </div>
+
+    <h2 id="check"><span class="num">1.</span>내 맥 용량, 뭐가 차지하고 있는지 확인하기</h2>
+    <p><b>Apple 메뉴() → 시스템 설정 → 일반 → 저장 공간</b>에서 색깔 막대로 대략적인 구성을 볼 수 있습니다.
+      하지만 여기서 보이는 '기타'나 '시스템 데이터'는 내용을 알려주지 않아 답답한 경우가 많죠.
+      실제로 용량을 차지하는 건 대부분 아래 네 가지입니다.</p>
+    <ul>
+      <li><b>앱 캐시·로그</b> — 브라우저·메신저·개발 도구가 쌓아 두는 임시 파일 (수 GB)</li>
+      <li><b>대용량 파일</b> — 옛날 영상, 디스크 이미지(.dmg), 압축 파일, 프로젝트 빌드 산출물</li>
+      <li><b>지운 앱의 잔여물</b> — 앱을 휴지통에 넣어도 남는 설정·지원 파일</li>
+      <li><b>다운로드 폴더와 휴지통</b> — 의외로 수십 GB가 잠들어 있는 곳</li>
+    </ul>
+
+    <h2 id="cache"><span class="num">2.</span>캐시·로그 정리 — 가장 쉽고 안전한 첫 단계</h2>
+    <p>캐시는 앱이 빨리 동작하려고 저장해 두는 임시 사본입니다. <b>지워도 안전하고, 필요하면 앱이 다시 만듭니다.</b>
+      수동으로 정리하려면 Finder에서 <code>⇧⌘G</code>를 누르고 <code>~/Library/Caches</code>로 이동해
+      폴더별 용량을 확인하며 지우면 됩니다.</p>
+    <div class="warn"><b>주의:</b> Caches 폴더 밖의 Library 파일은 함부로 지우지 마세요. 설정과 데이터가 함께 사라질 수 있습니다.
+      또 실행 중인 앱의 캐시는 지워도 곧바로 다시 생깁니다.</div>
+    <p>일일이 폴더를 뒤지는 게 번거롭다면, <a href="../">Abysso</a>의 <b>스마트 정리</b>가 캐시·로그·깨진 다운로드를
+      카테고리별로 스캔하고, 항목마다 <b>'삭제 권장'/'주의' 뱃지</b>로 지워도 되는지 알려줍니다.
+      모든 삭제는 휴지통을 거치므로 실수해도 되돌릴 수 있습니다.</p>
+    <div class="shot"><img src="../screenshots/smart-clean.png" alt="Abysso 스마트 정리 — 카테고리별 캐시 스캔과 안전도 뱃지" loading="lazy"></div>
+
+    <h2 id="large"><span class="num">3.</span>대용량 파일 찾기 — 몇 GB를 한 번에</h2>
+    <p>용량 확보의 지름길은 잔챙이 백 개가 아니라 <b>큰 파일 몇 개</b>입니다. Finder에서도
+      <code>⌘F</code> → '파일 크기가 ~보다 큼' 조건으로 찾을 수 있지만, 결과가 어디에 있는 무슨 파일인지
+      한눈에 파악하기 어렵습니다.</p>
+    <p>Abysso의 <b>대용량 파일</b> 탭은 홈 폴더를 병렬 스캔해 용량순 막대 차트로 보여주고,
+      <code>pack-299b1cc0….pack</code>처럼 정체를 알 수 없는 파일도 <b>"Git 저장소 데이터"</b>,
+      <b>"Xcode 빌드 캐시"</b>처럼 무엇인지 설명해 줍니다. 30일 이상 안 쓴 50MB+ 파일만 모아 보는
+      필터도 있어 "지워도 되는 것"부터 공략할 수 있습니다.</p>
+    <div class="shot"><img src="../screenshots/space-lens.png" alt="Abysso 대용량 파일 — 용량순 막대 차트와 파일 정체 표시" loading="lazy"></div>
+
+    <h2 id="uninstall"><span class="num">4.</span>앱 '완전' 삭제 — 잔여물까지</h2>
+    <p>앱을 휴지통에 넣는 것만으로는 끝나지 않습니다. <code>~/Library/Application Support</code>,
+      <code>~/Library/Caches</code>, <code>~/Library/Containers</code> 등에 앱이 남긴 데이터가
+      수백 MB씩 남는 경우가 흔합니다.</p>
+    <p>Abysso의 <b>앱 제거</b>는 앱을 고르면 관련 캐시·설정·지원 파일을 자동으로 찾아 함께 지워 줍니다.
+      이미 지운 앱이 남긴 <b>잔여 파일만 골라내는 스캔</b>도 있어, 예전에 쓰다 지운 앱들의 흔적도 정리할 수 있습니다.</p>
+    <div class="shot"><img src="../screenshots/uninstall.png" alt="Abysso 앱 제거 — 앱과 관련 파일 함께 삭제" loading="lazy"></div>
+
+    <h2 id="basics"><span class="num">5.</span>기본기 — 휴지통·다운로드·아이폰 백업</h2>
+    <ul>
+      <li><b>휴지통 비우기</b> — 삭제한 파일은 휴지통을 비우기 전까지 용량을 차지합니다.</li>
+      <li><b>다운로드 폴더</b> — 설치 후 방치된 .dmg/.zip 파일이 단골 범인입니다.</li>
+      <li><b>아이폰/아이패드 백업</b> — Finder 백업 하나가 수십 GB일 수 있습니다.
+        Finder → 기기 → '백업 관리'에서 오래된 백업을 삭제하세요.</li>
+      <li><b>사진 보관함</b> — iCloud 사진을 쓴다면 '맥 저장 공간 최적화'를 켜 원본을 클라우드에만 두세요.</li>
+    </ul>
+
+    <h2 id="system"><span class="num">6.</span>'시스템 데이터'가 수십 GB일 때</h2>
+    <p>저장 공간 화면의 '시스템 데이터'가 비정상적으로 크다면 대부분 이런 것들입니다.</p>
+    <ul>
+      <li><b>Time Machine 로컬 스냅샷</b> — 백업 디스크가 연결되지 않은 동안 맥이 임시로 저장하는 백업.
+        시간이 지나면 자동 정리되지만, 터미널에서 <code>tmutil listlocalsnapshots /</code>로 확인할 수 있습니다.</li>
+      <li><b>개발 도구 캐시</b> — Xcode DerivedData, npm·pip 캐시 등. 개발자라면 여기서만 수십 GB가 나옵니다.</li>
+      <li><b>오래된 로그와 진단 데이터</b> — 쌓이기만 하고 쓸 일은 거의 없습니다.</li>
+    </ul>
+    <div class="tip"><b>팁:</b> Abysso의 스마트 정리는 개발 도구 캐시를 별도 카테고리로 보여주고,
+      지워도 되지만 다음 빌드가 느려질 수 있는 항목은 '주의'로 표시해 줍니다.</div>
+
+    <h2 id="auto"><span class="num">7.</span>이 모든 걸 한 번에 — 자동화</h2>
+    <p>위 과정을 매번 수동으로 하기는 어렵습니다. <b>Abysso</b>는 이 가이드의 1~6단계를
+      한 앱에서 해결하도록 만든 <b>무료 맥 정리 앱</b>입니다.</p>
+    <ul>
+      <li>스마트 정리 — 캐시·로그·깨진 다운로드를 안전도 뱃지와 함께 정리</li>
+      <li>대용량 파일 — 용량순 차트 + 파일 정체 설명</li>
+      <li>앱 제거 — 잔여물까지 한 번에, 잔여 파일 스캔 포함</li>
+      <li>실시간 대시보드 — 디스크·메모리·CPU 현황과 휴지통 비우기</li>
+    </ul>
+    <p>계정도 구독도 필요 없고, 완전 삭제를 제외한 모든 삭제는 휴지통을 거쳐 복구 가능합니다.
+      모든 처리는 내 맥 안에서만 이루어집니다.</p>
+
+    <div class="cta">
+      <h2>맥 용량 정리, 5분이면 됩니다</h2>
+      <p>무료 베타 · Apple Silicon · 계정/구독 불필요</p>
+      <a class="btn" href="../Abysso-0.0.4.dmg" download>Abysso 무료 다운로드</a>
+      <p style="margin-top:10px;font-size:12.5px">처음 실행 시: 앱을 우클릭 → 열기 (서명 없는 베타)</p>
+    </div>
+
+    <div class="faq" id="faq">
+      <h2>자주 묻는 질문</h2>
+
+      <h3>Q. '시스템 데이터'가 너무 큰데 지워도 되나요?</h3>
+      <p>대부분 앱 캐시·로그·오래된 백업·로컬 스냅샷입니다. 캐시와 로그는 지워도 안전하지만,
+        정체를 모르는 시스템 파일을 직접 지우는 건 위험합니다. 안전한 항목만 골라주는 도구를 쓰세요.</p>
+
+      <h3>Q. 캐시를 지우면 문제가 생기지 않나요?</h3>
+      <p>캐시는 임시 파일이라 지워도 안전하고, 필요하면 앱이 다시 만듭니다.
+        단, 실행 중인 앱의 캐시는 곧바로 다시 생기고, 개발 도구 캐시는 다음 빌드가 느려질 수 있습니다.</p>
+
+      <h3>Q. 앱을 휴지통에 넣으면 완전히 삭제되나요?</h3>
+      <p>아닙니다. 라이브러리 폴더에 캐시·설정·지원 파일이 남습니다.
+        앱 제거 도구로 관련 파일까지 함께 지우는 것이 확실합니다.</p>
+
+      <h3>Q. 무료 맥 정리 프로그램도 안전한가요?</h3>
+      <p>무엇을 지우는지 미리 보여주고, 삭제가 휴지통을 거치는(=복구 가능한) 도구라면 안전합니다.
+        Abysso는 무료 베타이며 두 조건을 모두 지킵니다.</p>
+    </div>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p><a href="../">✦ Abysso</a> — 무료 맥 정리 앱 · <a href="https://github.com/mrhwang-dev/Abysso">GitHub</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
