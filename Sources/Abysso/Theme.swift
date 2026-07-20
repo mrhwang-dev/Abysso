@@ -46,6 +46,30 @@ enum Theme {
         )
     }
 
+    /// heroBackground 위에 방사형 보라·청록 글로우를 얹어 깊이감을 준 배경 뷰.
+    static var heroBackgroundView: some View {
+        heroBackground
+            .overlay(alignment: .top) {
+                RadialGradient(
+                    colors: [purple.opacity(0.35), .clear],
+                    center: .center, startRadius: 0, endRadius: 520
+                )
+                .frame(height: 520)
+                .offset(y: -120)
+                .blendMode(.screen)
+            }
+            .overlay(alignment: .topTrailing) {
+                RadialGradient(
+                    colors: [teal.opacity(0.16), .clear],
+                    center: .center, startRadius: 0, endRadius: 360
+                )
+                .frame(width: 460, height: 460)
+                .offset(x: 120, y: -80)
+                .blendMode(.screen)
+            }
+            .ignoresSafeArea()
+    }
+
     /// 사용률(0~1)에 따른 상태 색: 녹색 → 황색 → 적색
     static func statusColor(_ fraction: Double) -> Color {
         if fraction > 0.85 { return red }
@@ -97,6 +121,34 @@ struct GlassCardStyle: ViewModifier {
     }
 }
 
+/// 색상 틴트가 살짝 감도는 광택 카드 — 히어로 카드와 톤을 맞춘 보조 정보 타일용.
+struct TintedCardStyle: ViewModifier {
+    var tint: Color
+    var padding: CGFloat = 14
+    var cornerRadius: CGFloat = 18
+
+    func body(content: Content) -> some View {
+        content
+            .padding(padding)
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(LinearGradient(
+                            colors: [tint.opacity(0.20), tint.opacity(0.03)],
+                            startPoint: .topLeading, endPoint: .bottomTrailing
+                        ))
+                }
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .strokeBorder(tint.opacity(0.28), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.22), radius: 10, y: 5)
+    }
+}
+
 extension View {
     func card(padding: CGFloat = 16) -> some View {
         modifier(CardStyle(padding: padding))
@@ -104,6 +156,10 @@ extension View {
 
     func glassCard(padding: CGFloat = 14, cornerRadius: CGFloat = 14) -> some View {
         modifier(GlassCardStyle(padding: padding, cornerRadius: cornerRadius))
+    }
+
+    func tintedCard(_ tint: Color, padding: CGFloat = 14, cornerRadius: CGFloat = 18) -> some View {
+        modifier(TintedCardStyle(tint: tint, padding: padding, cornerRadius: cornerRadius))
     }
 }
 
@@ -132,15 +188,21 @@ struct HeroCard<Content: View>: View {
                 }
             )
             .overlay(alignment: .topTrailing) {
-                // 3D 광택 아이콘 근사 — 큰 심볼 + 밝은 그라디언트 + 소프트 글로우
-                Image(systemName: icon)
-                    .font(.system(size: 42, weight: .semibold))
-                    .foregroundStyle(LinearGradient(
-                        colors: [.white, tint],
-                        startPoint: .top, endPoint: .bottom
-                    ))
-                    .shadow(color: tint.opacity(0.6), radius: 14, y: 3)
-                    .padding(18)
+                // 3D 광택 아이콘 근사 — 뒤에 후광(글로우) 원 + 큰 심볼 + 밝은 그라디언트
+                ZStack {
+                    Circle()
+                        .fill(tint.opacity(0.35))
+                        .frame(width: 48, height: 48)
+                        .blur(radius: 15)
+                    Image(systemName: icon)
+                        .font(.system(size: 34, weight: .semibold))
+                        .foregroundStyle(LinearGradient(
+                            colors: [.white, tint],
+                            startPoint: .top, endPoint: .bottom
+                        ))
+                        .shadow(color: tint.opacity(0.7), radius: 9, y: 3)
+                }
+                .padding(16)
             }
             .overlay(
                 RoundedRectangle(cornerRadius: 22, style: .continuous)

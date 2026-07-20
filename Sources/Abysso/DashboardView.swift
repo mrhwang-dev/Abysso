@@ -38,7 +38,7 @@ struct DashboardView: View {
             }
             .padding(20)
         }
-        .background(Theme.heroBackground)
+        .background { Theme.heroBackgroundView }
         // 화면에 보이고(onAppear) 앱이 활성(.active)일 때만 폴링.
         // 탭 전환·창 최소화·다른 앱으로 전환 시 즉시 타이머 정지 → 백그라운드 CPU 0%.
         .onAppear { if scenePhase == .active { monitor.start() } }
@@ -238,16 +238,16 @@ struct DashboardView: View {
                         .font(.system(size: 12.5, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.7))
                     line1
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .font(.system(size: 19, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .lineLimit(1)
-                        .minimumScaleFactor(0.65)
+                        .minimumScaleFactor(0.6)
                     line2
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                .padding(.trailing, 46)
+                .padding(.trailing, 62)
 
                 SmoothBar(value: value, color: tint, height: 6)
 
@@ -297,7 +297,7 @@ struct DashboardView: View {
                 .featureLocked()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .glassCard(padding: 14)
+            .tintedCard(Theme.orange)
 
             // 배터리 (노트북) / 디스크 I/O (데스크탑)
             if let pct = monitor.snapshot.batteryPercent {
@@ -316,7 +316,7 @@ struct DashboardView: View {
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .glassCard(padding: 14)
+                .tintedCard(Theme.green)
             } else {
                 miniStatTile(
                     title: "디스크 I/O", icon: "internaldrive", tint: Theme.green,
@@ -365,7 +365,7 @@ struct DashboardView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .glassCard(padding: 14)
+        .tintedCard(tint)
     }
 
     // MARK: 동작
