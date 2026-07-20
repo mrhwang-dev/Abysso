@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>Abysso Updates</title>
+        <item>
+            <title>Version 0.0.2</title>
+            <pubDate>Mon, 20 Jul 2026 21:50:00 +0900</pubDate>
+            <sparkle:version>0.0.2</sparkle:version>
+            <sparkle:shortVersionString>0.0.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <h2>Abysso 0.0.2</h2>
+                <ul>
+                    <li>대용량 파일: 알아보기 힘든 파일의 정체를 함께 표시 (예: "Git 저장소 데이터")</li>
+                    <li>메인 화면 새 디자인 · 안정성 및 사용성 개선</li>
+                    <li>Large Files now explains cryptic files · redesigned dashboard · stability fixes</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://abysso-ten.vercel.app/Abysso-0.0.2.dmg"
+                sparkle:edSignature="aXsTRrplw7W6jmmQTnypsXwUd80TFysOXQQLy+HZd2VJoiXevrqD6O7DJJ9ZSqiJaKb0PDYBMlg1wijCHSb+Cw=="
+                length="4148378"
+                type="application/octet-stream"/>
+        </item>
+    </channel>
+</rss>

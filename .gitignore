@@ -2,3 +2,5 @@
 build/
 AppIcon.iconset/
 .DS_Store
+.vercel
+.env*
