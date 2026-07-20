@@ -256,10 +256,28 @@ final class LargeFilesModel: ObservableObject {
     ]
 
     /// 미디어 보관함(음악·사진)은 별도 TCC 권한을 추가로 요구하므로 FDA와 무관하게 항상 건너뛴다.
+    /// (경로는 macOS 버전에 따라 ~/Music/Music/… 처럼 중첩될 수 있어 이름 기반 판별도 함께 쓴다.)
     nonisolated static let mediaLibrarySubpaths = [
-        "Music/Music Library.musiclibrary", "Music/iTunes",
+        // ~/Music(Apple Music)·~/Movies(Apple TV)는 각각 라이브러리 번들뿐 아니라 실제
+        // 미디어 파일이 든 Media 폴더를 품고 있다. 시스템 '미디어 보관함' 권한은 음악·비디오를
+        // 함께 보호하므로, enumerator가 이 하위 파일들의 크기·접근일을 미리 읽는 것만으로도
+        // 권한 팝업이 뜬다. 두 폴더 모두 폴더째 건너뛰어 팝업을 원천 차단한다.
+        "Music",
+        "Movies",
         "Pictures/Photos Library.photoslibrary",
     ]
+
+    /// 위치와 무관하게 통째로 건너뛸 미디어 보관함 번들 확장자.
+    /// 이런 번들은 크기·접근일을 조회하는 것만으로도 '미디어 보관함 접근' 시스템
+    /// 권한 팝업을 유발하므로, 경로가 어디에 있든 이름(확장자)으로 판별해 건너뛴다.
+    nonisolated static let mediaBundleSuffixes = [
+        ".musiclibrary", ".photoslibrary", ".photolibrary",
+        ".tvlibrary", ".imovielibrary", ".theater", ".migratedphotolibrary",
+    ]
+
+    nonisolated static func isMediaLibraryBundle(_ name: String) -> Bool {
+        mediaBundleSuffixes.contains { name.hasSuffix($0) }
+    }
 
     /// FDA가 있어도 개별 시스템 팝업이나 원격 다운로드를 유발할 수 있어 항상 통째로 건너뛰는 경로.
     /// (iCloud Drive는 접근 순간 미다운로드 파일을 내려받으려 할 수 있고,
@@ -306,7 +324,7 @@ final class LargeFilesModel: ObservableObject {
 
         var found: [LargeFile] = []
         var subdirs: [URL] = []
-        for url in top where !isSkipped(url.path) {
+        for url in top where !isSkipped(url.path) && !Self.isMediaLibraryBundle(url.lastPathComponent) {
             guard let values = try? url.resourceValues(forKeys: Set(scanKeys)) else { continue }
             if values.isSymbolicLink == true { continue }  // 링크는 따라가지 않는다 (순환 방지)
             if values.isDirectory == true {
@@ -352,20 +370,23 @@ final class LargeFilesModel: ObservableObject {
         ) else { return [] }
 
         for case let url as URL in enumerator {
+            // 스킵 판정을 resourceValues 읽기보다 먼저 한다.
+            // 미디어 보관함(Music Library.musiclibrary 등) 같은 TCC 보호 경로는 크기·접근일을
+            // 조회하는 것만으로도 시스템 권한 팝업(음악·미디어 보관함 접근)을 띄우므로,
+            // 메타데이터를 읽기 전에 통째로 건너뛰어야 팝업이 뜨지 않는다.
+            if url.lastPathComponent == ".Trash"
+                || Self.isMediaLibraryBundle(url.lastPathComponent)
+                || isSkipped(url.path) {
+                enumerator.skipDescendants()
+                continue
+            }
             guard let values = try? url.resourceValues(forKeys: Set(scanKeys)) else { continue }
             sinceReport += 1
             if sinceReport >= 2000 {
                 progress?(sinceReport)   // UI 갱신은 파일마다가 아니라 2,000개 배치로만
                 sinceReport = 0
             }
-            if values.isDirectory == true {
-                // 스킵 판정은 폴더에서만 — 파일마다 문자열 비교를 반복하지 않는다.
-                // 폴더를 열기 전에 건너뛰므로 TCC 팝업도 유발하지 않는다.
-                if url.lastPathComponent == ".Trash" || isSkipped(url.path) {
-                    enumerator.skipDescendants()
-                }
-                continue
-            }
+            if values.isDirectory == true { continue }
             guard values.isRegularFile == true else { continue }
             let size = Int64(values.totalFileAllocatedSize ?? values.fileAllocatedSize ?? 0)
             if size >= minBytes {
