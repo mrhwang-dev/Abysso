@@ -38,7 +38,7 @@ struct DashboardView: View {
             }
             .padding(20)
         }
-        .background(Theme.background)
+        .background(Theme.heroBackground)
         // 화면에 보이고(onAppear) 앱이 활성(.active)일 때만 폴링.
         // 탭 전환·창 최소화·다른 앱으로 전환 시 즉시 타이머 정지 → 백그라운드 CPU 0%.
         .onAppear { if scenePhase == .active { monitor.start() } }
@@ -144,10 +144,11 @@ struct DashboardView: View {
     // MARK: 게이지 카드 (디스크 / 메모리 / CPU)
 
     private var gaugeRow: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: 14) {
             // 디스크
             gaugeCard(
-                value: monitor.snapshot.diskFraction, label: "디스크",
+                value: monitor.snapshot.diskFraction, tint: Theme.blue,
+                icon: "internaldrive.fill", category: "저장 공간",
                 line1: Text("\(Format.bytes(monitor.snapshot.diskFree)) 남음"),
                 line2: Text("전체 \(Format.bytes(monitor.snapshot.diskTotal))")
             ) {
@@ -173,7 +174,8 @@ struct DashboardView: View {
 
             // 메모리
             gaugeCard(
-                value: monitor.snapshot.memFraction, label: "메모리",
+                value: monitor.snapshot.memFraction, tint: Theme.teal,
+                icon: "memorychip.fill", category: "메모리",
                 line1: Text("\(Format.bytes(Int64(monitor.snapshot.memUsed))) 사용 중"),
                 line2: Text("전체 \(Format.bytes(Int64(monitor.snapshot.memTotal)))")
             ) {
@@ -196,9 +198,10 @@ struct DashboardView: View {
 
             // CPU
             gaugeCard(
-                value: monitor.snapshot.cpuUsage, label: "CPU",
-                line1: Text("실시간 사용률"),
-                line2: Text(monitor.machine.chip.isEmpty ? "—" : monitor.machine.chip)
+                value: monitor.snapshot.cpuUsage, tint: Theme.orange,
+                icon: "cpu.fill", category: "CPU",
+                line1: Text("\(Int(monitor.snapshot.cpuUsage * 100))%"),
+                line2: Text(monitor.machine.chip.isEmpty ? "실시간 사용률" : monitor.machine.chip)
             ) {
                 Button {
                     selection = .optimization
@@ -220,31 +223,39 @@ struct DashboardView: View {
         }
     }
 
-    /// 링 게이지를 좌측, 수치를 우측에 눕혀 배치한 컴팩트 게이지 카드.
-    /// 하단에 작은 크기의 액션 버튼들을 세로로 쌓는다.
+    /// 좌상단 라벨 · 큰 수치 · 사용량 바 · 우상단 광택 아이콘의 대형 히어로 카드.
+    /// 하단에 작은 액션 버튼들을 세로로 쌓는다.
     private func gaugeCard(
-        value: Double, label: LocalizedStringKey,
+        value: Double, tint: Color, icon: String, category: LocalizedStringKey,
         line1: Text, line2: Text,
-        @ViewBuilder buttons: () -> some View
+        @ViewBuilder buttons: @escaping () -> some View
     ) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 12) {
-                RingGauge(value: value, label: label, size: 68, lineWidth: 7)
+        HeroCard(tint: tint, icon: icon) {
+            VStack(alignment: .leading, spacing: 8) {
+                // 텍스트 블록은 우상단 아이콘과 겹치지 않게 오른쪽 여백을 준다
                 VStack(alignment: .leading, spacing: 3) {
+                    Text(category)
+                        .font(.system(size: 12.5, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
                     line1
-                        .font(.system(size: 13.5, weight: .semibold, design: .rounded))
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.65)
                     line2
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                Spacer(minLength: 0)
+                .padding(.trailing, 46)
+
+                SmoothBar(value: value, color: tint, height: 6)
+
+                Spacer(minLength: 8)
+                VStack(spacing: 6) { buttons() }
+                    .controlSize(.small)
             }
-            VStack(spacing: 6) { buttons() }
-                .controlSize(.small)
         }
-        .frame(maxWidth: .infinity)
-        .glassCard(padding: 14)
     }
 
     private func openActivityMonitor() {
