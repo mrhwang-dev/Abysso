@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 // MARK: - 뷰모델
 
@@ -40,6 +41,17 @@ final class OptimizationModel: ObservableObject {
     @Published var message: String?
 
     private var timer: Timer?
+    private var agentsObserver: AnyCancellable?
+
+    init() {
+        // agents는 중첩 ObservableObject라 SwiftUI가 자동으로 관찰하지 못한다.
+        // 로그인 항목 로딩이 끝나(agents.loaded=true) 목록이 채워져도 뷰가
+        // 갱신되지 않아 스피너가 무한히 도는 문제가 있어, 중첩 객체의 변경을
+        // 이 모델의 변경으로 전달해 뷰를 다시 그리게 한다.
+        agentsObserver = agents.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
+    }
 
     /// 프로세스 폴링이 필요한 섹션인지 (로그인 항목 섹션에선 ps를 돌릴 필요 없음)
     private var needsProcessPolling: Bool {
