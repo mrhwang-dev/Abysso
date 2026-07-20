@@ -174,6 +174,8 @@ final class CacheModel: ObservableObject {
                         guard fm.fileExists(atPath: url.path) else { return nil }
                         let size = DiskUtil.itemSize(url)
                         if size > 500_000 {
+                            // 브라우저별 "Chrome 캐시" 등은 Localizable.strings에 개별 키가 있어
+                            // LocalizedStringKey 표시 시 자동 번역된다.
                             return CacheItem(name: "\(name) 캐시", url: url, size: size)
                         }
                         return nil
@@ -383,7 +385,7 @@ final class CacheModel: ObservableObject {
         "org.swift.swiftpm": "Swift Package Manager",
         "com.apple.helpd": "macOS Help",
         "com.apple.parsecd": "Siri Suggestions",
-        "com.apple.akd": "Apple 계정 (AuthKit)",
+        "com.apple.akd": "Apple Account (AuthKit)",
         "com.apple.amsengagementd": "Apple Media Services",
         "com.apple.geod": "Apple Maps",
     ]

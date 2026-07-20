@@ -454,3 +454,6 @@
 /* Space Lens tile tooltip */
 "%@ — %@ · 디스크 사용량의 %.1f%%" = "%@ — %@ · %.1f%% de uso de disco";
 "유지보수 실행" = "Ejecutar mantenimiento";
+
+/* 스크린샷 감사에서 추가된 누락 키 */
+"상세 보기" = "Ver detalles";

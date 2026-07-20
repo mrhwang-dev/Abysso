@@ -454,3 +454,6 @@
 
 /* Space Lens tile tooltip */
 "%@ — %@ · 디스크 사용량의 %.1f%%" = "%@ — %@ · %.1f%% der Festplattennutzung";
+
+/* 스크린샷 감사에서 추가된 누락 키 */
+"상세 보기" = "Details anzeigen";
