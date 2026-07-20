@@ -2,51 +2,47 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleName</key>
-    <string>Cleanova</string>
-    <key>CFBundleDisplayName</key>
-    <string>Cleanova</string>
-    <key>CFBundleIdentifier</key>
-    <string>app.cleanova.mac</string>
-    <key>CFBundleExecutable</key>
-    <string>Cleanova</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
-    <key>CFBundleVersion</key>
-    <string>1</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>14.0</string>
-    <!-- 기본 개발 언어 + 지원 언어 목록. 이 목록에 든 언어 중 사용자 Mac의
-         우선 언어로 AppKit 표준 메뉴(앱 정보/가리기/종료/편집/윈도우 등)가 자동 현지화됩니다.
-         (한국어 Mac이면 메뉴가 한국어로 표시됨) -->
-    <key>CFBundleDevelopmentRegion</key>
-    <string>ko</string>
-    <key>CFBundleLocalizations</key>
-    <array>
-        <string>ko</string>
-        <string>en</string>
-    </array>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-    <key>CFBundleIconFile</key>
-    <string>AppIcon</string>
-
-    <!-- ===== Sparkle 자동 업데이트 ===== -->
-    <!-- 업데이트 정보를 담은 appcast.xml의 실제 주소로 교체하세요. -->
-    <key>SUFeedURL</key>
-    <string>https://yourwebsite.com/appcast.xml</string>
-
-    <!-- 업데이트 서명 검증용 EdDSA 공개키.
-         아직 키가 없으므로 비워둡니다. 배포 전 반드시 설정해야 합니다:
-           1) Sparkle 배포물의 bin/generate_keys 실행 → 키쌍 생성
-              (개인키는 macOS 키체인에 저장되고, 공개키 문자열이 출력됨)
-           2) 출력된 공개키를 아래 <string>에 넣기
-           3) 업데이트 zip은 bin/sign_update 로 서명해 appcast.xml의 sparkle:edSignature에 기입
-         공개키를 넣지 않으면 Sparkle이 서명을 검증할 수 없어 실제 업데이트 설치는 차단됩니다.
-         (지금은 뼈대 구축 단계이므로 확인 UI만 동작하고 다운로드/설치는 하지 않습니다.) -->
-    <!-- <key>SUPublicEDKey</key>
-    <string></string> -->
+	<key>CFBundleDevelopmentRegion</key>
+	<string>ko</string>
+	<key>CFBundleDisplayName</key>
+	<string>Abysso</string>
+	<key>CFBundleExecutable</key>
+	<string>Abysso</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>app.abysso.mac</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>ko</string>
+		<string>en</string>
+		<string>ja</string>
+		<string>zh-Hant</string>
+		<string>de</string>
+		<string>es</string>
+		<string>fr</string>
+	</array>
+	<key>CFBundleName</key>
+	<string>Abysso</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.0.1</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>스페이스 렌즈 스캔을 위해 폴더에 접근합니다</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>스페이스 렌즈 스캔을 위해 폴더에 접근합니다</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>스페이스 렌즈 스캔을 위해 폴더에 접근합니다</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://abysso.app/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>OqrpJz0BIh94CwKz7FfJFf1oQAuXP1sJ9q7Xq1zse+8=</string>
 </dict>
 </plist>
