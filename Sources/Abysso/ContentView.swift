@@ -3,7 +3,7 @@ import SwiftUI
 enum SidebarItem: String, CaseIterable, Identifiable {
     case dashboard = "시스템 현황"
     case cache = "스마트 정리"
-    case largeFiles = "스페이스 렌즈"
+    case largeFiles = "대용량 파일"
     case uninstall = "앱 제거"
     case shredder = "완전 삭제"
     case optimization = "최적화"

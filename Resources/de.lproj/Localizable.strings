@@ -8,7 +8,7 @@
 /* ===== Sidebar / tab titles ===== */
 "시스템 현황" = "Systemstatus";
 "스마트 정리" = "Smart-Bereinigung";
-"스페이스 렌즈" = "Space Lens";
+"대용량 파일" = "Große Dateien";
 "앱 제거" = "Deinstallationsprogramm";
 "오래된 대용량 파일" = "Große & alte Dateien";
 "전체 보기" = "Alle Dateien";
@@ -457,3 +457,20 @@
 
 /* 스크린샷 감사에서 추가된 누락 키 */
 "상세 보기" = "Details anzeigen";
+
+/* 대용량 파일 정체 설명 */
+"Git 저장소 데이터" = "Git-Repository-Daten";
+"Node.js 패키지 데이터" = "Node.js-Pakete";
+"Xcode 빌드 캐시" = "Xcode-Build-Cache";
+"Python 패키지 데이터" = "Python-Pakete";
+"Xcode 개발 데이터" = "Xcode-Entwicklerdaten";
+"빌드 도구 캐시" = "Build-Tool-Cache";
+"Docker 데이터" = "Docker-Daten";
+"앱 저장 데이터" = "App-Speicherdaten";
+"앱 캐시 데이터" = "App-Cache-Daten";
+"로그 데이터" = "Protokolldaten";
+"디스크 이미지" = "Disk-Image";
+"설치 패키지" = "Installationspaket";
+"디자인 파일" = "Designdatei";
+"데이터베이스 파일" = "Datenbankdatei";
+"가상 머신 디스크" = "VM-Festplatte";
