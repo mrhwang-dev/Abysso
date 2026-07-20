@@ -136,6 +136,50 @@ enum FriendlyPath {
     }
 }
 
+// MARK: - 파일 정체 추론
+
+/// 암호처럼 알아보기 힘든 파일 이름이라도 경로·확장자로 "이게 대체 무엇인지"를 짐작해
+/// 사람이 읽을 수 있는 설명을 돌려준다. (예: .git 안의 pack-<해시>.pack → "Git 저장소 데이터")
+/// 반환값은 Localizable.strings 키(한국어 리터럴)이므로 표시 시 언어별로 번역된다.
+enum FileMeaning {
+    nonisolated static func of(_ url: URL) -> String? {
+        let comps = Set(url.pathComponents)
+        let ext = url.pathExtension.lowercased()
+        let path = url.path
+
+        // 1) 위치 기반 (가장 확실한 단서)
+        if comps.contains(".git") || (url.lastPathComponent.hasPrefix("pack-") && (ext == "pack" || ext == "idx")) {
+            return "Git 저장소 데이터"
+        }
+        if comps.contains("node_modules") { return "Node.js 패키지 데이터" }
+        if comps.contains("DerivedData") { return "Xcode 빌드 캐시" }
+        if comps.contains("site-packages") || comps.contains(".venv") || comps.contains("venv") {
+            return "Python 패키지 데이터"
+        }
+        if path.contains("/Library/Developer/") { return "Xcode 개발 데이터" }
+        if comps.contains(".gradle") || comps.contains(".m2") || comps.contains(".cargo") {
+            return "빌드 도구 캐시"
+        }
+        if path.contains("com.docker") || comps.contains(".docker") { return "Docker 데이터" }
+        if comps.contains("Containers") || comps.contains("Group Containers") { return "앱 저장 데이터" }
+        if comps.contains("Caches") || comps.contains("Cache") { return "앱 캐시 데이터" }
+        if comps.contains("Logs") { return "로그 데이터" }
+
+        // 2) 확장자 기반
+        switch ext {
+        case "app": return "응용 프로그램"
+        case "dmg", "iso", "sparseimage": return "디스크 이미지"
+        case "pkg", "mpkg": return "설치 패키지"
+        case "zip", "tar", "gz", "7z", "rar", "bz2", "xz", "tgz": return "압축 파일"
+        case "pack", "idx": return "Git 저장소 데이터"
+        case "sketch", "psd", "fig", "xd": return "디자인 파일"
+        case "sqlite", "sqlite3", "db", "realm": return "데이터베이스 파일"
+        case "vmdk", "qcow2", "vdi": return "가상 머신 디스크"
+        default: return nil
+        }
+    }
+}
+
 @MainActor
 final class LargeFilesModel: ObservableObject {
     @Published var allFiles: [LargeFile] = []
@@ -424,7 +468,7 @@ struct LargeFilesView: View {
     var body: some View {
         VStack(spacing: 0) {
             PageHeader(
-                title: "스페이스 렌즈",
+                title: "대용량 파일",
                 subtitle: "큰 파일을 한눈에 — 막대가 길수록 차지하는 공간이 큽니다",
                 icon: "chart.bar.xaxis", iconColor: Theme.purple
             )
@@ -655,10 +699,13 @@ struct LargeFilesView: View {
                     Circle().fill(file.kind.tint).frame(width: 8, height: 8)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(file.url.lastPathComponent)
-                        // 시스템 경로 대신 이해하기 쉬운 위치 이름 (실제 경로는 툴팁으로)
-                        Text(file.friendlyLocation)
+                        // "이게 무엇인지"(정체) + 이해하기 쉬운 위치. 실제 경로는 툴팁으로.
+                        (FileMeaning.of(file.url).map {
+                            Text(LocalizedStringKey($0)).foregroundColor(file.kind.tint)
+                                + Text("  ·  ").foregroundColor(.secondary)
+                                + Text(file.friendlyLocation).foregroundColor(.secondary)
+                        } ?? Text(file.friendlyLocation).foregroundColor(.secondary))
                             .font(.caption)
-                            .foregroundStyle(.secondary)
                             .lineLimit(1)
                             .truncationMode(.middle)
                             .help(file.displayPath)
@@ -742,9 +789,13 @@ private struct SizeBarRow: View {
                         .font(.system(size: 12.5, weight: .semibold, design: .rounded))
                         .lineLimit(1)
                         .truncationMode(.middle)
-                    Text(file.friendlyLocation)
+                    // "이게 무엇인지"(정체)를 종류 색으로 먼저, 이어서 위치를 흐리게
+                    (FileMeaning.of(file.url).map {
+                        Text(LocalizedStringKey($0)).foregroundColor(file.kind.tint)
+                            + Text("  ·  ").foregroundColor(.secondary)
+                            + Text(file.friendlyLocation).foregroundColor(.secondary)
+                    } ?? Text(file.friendlyLocation).foregroundColor(.secondary))
                         .font(.caption2)
-                        .foregroundStyle(.tertiary)
                         .lineLimit(1)
                         .truncationMode(.middle)
                     Spacer(minLength: 8)

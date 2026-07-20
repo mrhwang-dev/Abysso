@@ -794,6 +794,9 @@ private struct CategoryCard: View {
                                 .font(.callout)
                                 .monospacedDigit()
                         }
+                        // 행 어디에 마우스를 올려도 왜 '삭제 권장'/'주의'인지 설명을 보여준다
+                        .contentShape(Rectangle())
+                        .help(item.safety.help)
                     }
                 }
             }
