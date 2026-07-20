@@ -1,11 +1,13 @@
 # Abysso
 
+**한국어** | [English](README.en.md)
+
 **완전 무료** macOS 개인 정리 유틸리티. 캐시·대용량 파일·앱 잔여물을 안전하게 찾아 정리한다. 계정·구독 없이 모든 기능을 무료로 쓸 수 있고, 모든 삭제는 휴지통을 거치며(완전 삭제 제외), 다크 전용 테마와 7개 언어 UI를 지원한다.
 
 - **버전:** v0.0.1 (Free Beta)
 - **번들 ID:** `app.abysso.mac`
 - **플랫폼:** macOS (Apple Silicon), SwiftUI + Swift Package Manager
-- **도메인:** [abysso.app](https://abysso.app)
+- **웹사이트:** [abysso-ten.vercel.app](https://abysso-ten.vercel.app) (7개 언어 랜딩 페이지, `web/`)
 
 ![시스템 현황 대시보드](docs/screenshots/dashboard.png)
 
@@ -72,6 +74,7 @@ Sources/Abysso/       # 앱 소스 (SwiftUI 뷰 + 모델, 31개 파일)
   Theme.swift         # 다크 테마 + 공용 컴포넌트
   ...
 Resources/*.lproj/    # 다국어 문자열
+web/                  # 랜딩 페이지 (7개 언어, Vercel 배포 — Root Directory: web)
 Tools/                # 아이콘·DMG 배경 생성기
 Info.plist            # 번들 설정 (Sparkle 공개키 등)
 build-app.sh          # 빌드 스크립트
@@ -83,7 +86,7 @@ validate_strings.py   # 번역 키 정합성 검사기
 1. `Info.plist`의 버전을 올린다
 2. `./create-dmg.sh`로 DMG 생성
 3. `sign_update <dmg>`로 서명
-4. `appcast.xml`의 `enclosure`(edSignature, length) 갱신 → `https://abysso.app/appcast.xml`에 배포
+4. `appcast.xml`의 `enclosure`(edSignature, length) 갱신 → `web/`에 넣어 배포 (`https://abysso-ten.vercel.app/appcast.xml`)
 
 > EdDSA 개인키는 로그인 키체인에 있으며 **재생성 금지** — 재생성하면 기존 배포본이 업데이트되지 않는다.
 
