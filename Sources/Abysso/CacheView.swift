@@ -378,6 +378,14 @@ final class CacheModel: ObservableObject {
         "net.whatsapp.whatsapp": "WhatsApp",
         "com.openai.chat": "ChatGPT",
         "com.anthropic.claudefordesktop": "Claude",
+        // 개발 도구·시스템 데몬 — 규칙 변환으로는 "Swift Swiftpm"·"Apple Helpd"처럼
+        // 어색하게 나오는 대표 케이스를 사람이 읽기 좋은 이름으로 고정한다.
+        "org.swift.swiftpm": "Swift Package Manager",
+        "com.apple.helpd": "macOS Help",
+        "com.apple.parsecd": "Siri Suggestions",
+        "com.apple.akd": "Apple 계정 (AuthKit)",
+        "com.apple.amsengagementd": "Apple Media Services",
+        "com.apple.geod": "Apple Maps",
     ]
 
     /// 단어만으로는 앱을 특정하지 못하는 군더더기 접미어 — 이름 끝에 오면 잘라낸다.
@@ -409,8 +417,19 @@ final class CacheModel: ObservableObject {
                 if w.allSatisfy({ $0.isLowercase || $0.isNumber }), let first = w.first {
                     w = first.uppercased() + w.dropFirst()
                 }
-                // 벤더명이 앱 이름 첫 단어와 겹치면 한 번만 (apple.AppleMediaServices → "Apple Media Services")
-                if words.last?.caseInsensitiveCompare(w) == .orderedSame { continue }
+                // 벤더명이 앱 이름과 겹치면 중복을 정리한다.
+                if let last = words.last {
+                    let lw = last.lowercased(), ww = w.lowercased()
+                    // 완전히 같으면 한 번만 (apple.AppleMediaServices → "Apple Media Services")
+                    if lw == ww { continue }
+                    // 한쪽이 다른 쪽의 접두어면 더 긴 쪽만 남긴다
+                    // (swift.swiftpm → "Swift Swiftpm" 대신 "Swiftpm"). 짧은 조각의
+                    // 우연한 일치를 막기 위해 최소 4글자 이상일 때만 적용한다.
+                    if min(lw.count, ww.count) >= 4 {
+                        if ww.hasPrefix(lw) { words[words.count - 1] = w; continue }
+                        if lw.hasPrefix(ww) { continue }
+                    }
+                }
                 words.append(w)
             }
         }
