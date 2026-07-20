@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Cleanova",
+    name: "Abysso",
     platforms: [.macOS(.v14)],
     dependencies: [
         // 원격 오류/크래시 수집. 실제 배포 전 DSN을 발급받아 설정하세요.
@@ -12,12 +12,12 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "Cleanova",
+            name: "Abysso",
             dependencies: [
                 .product(name: "Sentry", package: "sentry-cocoa"),
                 .product(name: "Sparkle", package: "Sparkle"),
             ],
-            path: "Sources/Cleanova",
+            path: "Sources/Abysso",
             linkerSettings: [
                 .linkedFramework("IOKit"),
                 .linkedFramework("CoreServices"),
