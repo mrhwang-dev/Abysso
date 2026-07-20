@@ -41,7 +41,7 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>https://abysso.app/appcast.xml</string>
+	<string>https://abysso.vercel.app/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>OqrpJz0BIh94CwKz7FfJFf1oQAuXP1sJ9q7Xq1zse+8=</string>
 </dict>
