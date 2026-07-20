@@ -2,7 +2,7 @@
 
 [한국어](README.md) | **English**
 
-A **100% free** personal cleaning utility for macOS. Safely find and clean caches, large files, and app leftovers. No account, no subscription — every feature is free. All deletions go through the Trash (except Delete Completely), with a dark-only theme and a 7-language UI.
+A personal cleaning utility for macOS. Safely find and clean caches, large files, and app leftovers. **Free beta** — no account or subscription required. All deletions go through the Trash (except Delete Completely), with a dark-only theme and a 7-language UI.
 
 - **Version:** v0.0.1 (Free Beta)
 - **Bundle ID:** `app.abysso.mac`
