@@ -57,6 +57,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
 
+        // 앱 기능과 무관한 템플릿 메뉴(파일·포맷·보기·도움말)를 메뉴 막대에서 제거.
+        // 시스템이 뒤늦게 항목(피드백 보내기 등)을 주입해 메뉴가 되살아날 수 있으므로
+        // 창이 활성화될 때마다 약간의 시차를 두고 두 번씩 다시 정리한다.
+        // 메뉴 막대 어시스턴트(상태 아이템) 설정과는 무관하므로 항상 실행한다 —
+        // 어시스턴트를 꺼도 상단 메뉴 정리와 Cmd+W 복원은 그대로 적용돼야 한다.
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.didBecomeKeyNotification, object: nil, queue: .main
+        ) { _ in
+            for delay in [0.5, 2.0] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) { AppDelegate.pruneTemplateMenus() }
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { AppDelegate.pruneTemplateMenus() }
+
         // 환경설정에서 메뉴 막대를 끈 경우 상태 아이템을 만들지 않음
         let menuBarEnabled = UserDefaults.standard.object(forKey: "menuBarEnabled") as? Bool ?? true
         guard menuBarEnabled else { return }
@@ -74,18 +88,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         popover.contentViewController = NSHostingController(rootView: MenuBarView())
         popover.behavior = .transient  // 바깥 클릭 시 자동 닫힘
         popover.animates = true
-
-        // 앱 기능과 무관한 템플릿 메뉴(파일·포맷·보기·도움말)를 메뉴 막대에서 제거.
-        // 시스템이 뒤늦게 항목(피드백 보내기 등)을 주입해 메뉴가 되살아날 수 있으므로
-        // 창이 활성화될 때마다 약간의 시차를 두고 두 번씩 다시 정리한다.
-        NotificationCenter.default.addObserver(
-            forName: NSWindow.didBecomeKeyNotification, object: nil, queue: .main
-        ) { _ in
-            for delay in [0.5, 2.0] {
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay) { AppDelegate.pruneTemplateMenus() }
-            }
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { AppDelegate.pruneTemplateMenus() }
     }
 
     /// 앱에서 쓰지 않는 기본 템플릿 메뉴의 (언어별) 제목 — 편집·윈도우는 남긴다.
