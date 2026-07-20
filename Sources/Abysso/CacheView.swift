@@ -110,7 +110,14 @@ final class CacheModel: ObservableObject {
             await report(0, "앱 캐시 스캔 중…")
             var appCaches: [CacheItem] = []
             let cachesDir = home.appendingPathComponent("Library/Caches")
-            let browserPrefixes = ["Google", "com.apple.Safari", "Firefox", "com.microsoft.edgemac", "company.thebrowser"]
+            // 브라우저 캐시(별도 카테고리)와 함께, 미디어 보관함 관련 Apple 캐시도 제외한다.
+            // iTunes·Music·TV·AMP 등의 캐시는 크기 계산(하위 파일 접근)만으로도 '미디어 보관함
+            // 접근' 시스템 권한 팝업을 띄우므로 반드시 건너뛴다(소문자 접두어로 판별).
+            let skipCachePrefixes = [
+                "google", "com.apple.safari", "firefox", "com.microsoft.edgemac", "company.thebrowser",
+                "com.apple.itunes", "com.apple.music", "com.apple.tv", "com.apple.amp",
+                "com.apple.applemediaservices", "com.apple.mediaanalysisd", "com.apple.amsengagementd",
+            ]
             if let subdirs = try? fm.contentsOfDirectory(
                 at: cachesDir, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]
             ) {
@@ -118,7 +125,8 @@ final class CacheModel: ObservableObject {
                     for dir in subdirs {
                         group.addTask {
                             let name = dir.lastPathComponent
-                            guard !browserPrefixes.contains(where: { name.hasPrefix($0) }) else { return nil }
+                            let lname = name.lowercased()
+                            guard !skipCachePrefixes.contains(where: { lname.hasPrefix($0) }) else { return nil }
                             let size = DiskUtil.itemSize(dir)
                             if size > 1_000_000 {
                                 let displayName: String
