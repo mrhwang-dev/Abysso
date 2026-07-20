@@ -45,6 +45,10 @@
   h1{font-size:clamp(40px,7vw,72px);font-weight:800;letter-spacing:-1.5px;line-height:1.05;
     background:linear-gradient(180deg,#fff, #c7c2ea);-webkit-background-clip:text;background-clip:text;color:transparent}
   .tagline{font-size:clamp(17px,2.4vw,21px);color:var(--muted);max-width:620px;margin:20px auto 0}
+  .free{margin:20px auto 0;display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:clamp(15px,2vw,18px);
+    color:#eafffb;background:linear-gradient(135deg,rgba(45,212,191,.16),rgba(76,141,255,.14));
+    border:1px solid rgba(45,212,191,.35);border-radius:999px;padding:10px 20px}
+  .free b{background:linear-gradient(135deg,var(--teal),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
   .cta{margin-top:34px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
   .btn{padding:13px 26px;border-radius:12px;font-weight:600;font-size:15px;border:1px solid var(--line)}
   .btn.primary{background:linear-gradient(135deg,var(--blue),var(--teal));color:#06121a;border:0;
@@ -94,15 +98,16 @@
   </header>
 
   <div class="hero">
-    <span class="pill"><span class="dot"></span> Coming soon for macOS</span>
+    <span class="pill"><span class="dot"></span> Free · Coming soon for macOS</span>
     <h1>A beautiful,<br>private Mac cleaner.</h1>
     <p class="tagline">Reclaim gigabytes, remove apps completely, and keep your Mac light —
       fast, native, and everything stays on your device.</p>
+    <p class="free">✨ <span><b>100% free</b> — no account, no subscription, no upsell.</span></p>
     <div class="cta">
       <a class="btn primary" href="#features">See what it does</a>
       <a class="btn ghost" href="https://github.com/mrhwang-dev/Abysso">GitHub →</a>
     </div>
-    <p class="meta">Apple Silicon · macOS · v0.0.1 (Free Beta)</p>
+    <p class="meta">Apple Silicon · macOS · Always free · v0.0.1 (Beta)</p>
 
     <div class="shot"><img src="screenshots/dashboard.png" alt="Abysso system status dashboard" loading="lazy"></div>
   </div>
